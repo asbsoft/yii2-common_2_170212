@@ -1,0 +1,123 @@
+<?php
+
+namespace asb\yii2\common_2_170212\web;
+
+use asb\yii2\common_2_170212\base\UniModule;
+use asb\yii2\common_2_170212\base\BaseModule;
+
+use Yii;
+use yii\base\Component;
+use yii\web\GroupUrlRule;
+use yii\rest\UrlRule as RestUrlRule;
+use yii\web\UrlRule as WebUrlRule;
+
+/**
+ * Module routes builder
+ *
+ * @author ASB <ab2014box@gmail.com>
+ */
+class BaseRoutesBuilder extends Component
+{
+    /** Default config subpath from module root directory */
+    public static $configsSubdir  = 'config';
+
+    /**
+     * Build routes group by routes config.
+     * @param array $routeConfig
+     * @param yii\base\Application $app
+     */
+    public static function buildRoutes($routeConfig, $app = null)
+    {//echo __METHOD__;var_dump($routeConfig);
+
+        $app = empty($app) ? Yii::$app : $app;
+
+        if (isset($routeConfig['urlPrefix']) && $routeConfig['urlPrefix'] !== false && is_file($routeConfig['fileRoutes'])) {
+
+            switch ($routeConfig['class']) {
+                case GroupUrlRule::className(): // only for this class config-routes-files very simple
+                    $routes = include($routeConfig['fileRoutes']);//var_dump($routes);exit;
+                    if (empty($routes)) break;
+
+                    $configGroupRules = [
+                        'rules'  => $routes,
+                        'prefix' => $routeConfig['urlPrefix'],
+                        'routePrefix' => $routeConfig['moduleUid'],
+                    ];//var_dump($configGroupRules);
+                    $app->urlManager->addRules([new GroupUrlRule($configGroupRules)], $routeConfig['append']);
+                    break;
+
+                default: // universal
+                    //echo __METHOD__;var_dump($routeConfig);
+                    //!! config file use var $routeConfig:
+                    $rules = include($routeConfig['fileRoutes']);//var_dump($rules);exit;
+                    if (empty($rules)) break;
+
+                    if (isset($rules['enablePrettyUrl'])) {
+                        $app->urlManager->enablePrettyUrl = $rules['enablePrettyUrl'];
+                        unset($rules['enablePrettyUrl']);
+                    }//var_dump($rules);exit;
+                    $app->urlManager->addRules($rules, $routeConfig['append']);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Collect full module's URL-prefix from URL-prefixes of container("parent") modules.
+     * @param string $urlPrefix (initial) prefix
+     * @param yii\base\Module $module
+     * @param string $type
+     * @return string new URL-prefix
+     */
+    public static function correctUrlPrefix($urlPrefix, $module, $type)
+    {//echo __METHOD__."('$urlPrefix', {$module->uniqueId}, $type)<br>";
+        // if $urlPrefix begin with '/' use it as absolute prefix
+        if (substr($urlPrefix, 0, 1) == '/') {
+            return substr($urlPrefix, 1);
+        }
+        
+        if (empty($module->routesConfig[$type])) {
+            return $urlPrefix;
+        }
+
+        $conf = $module->routesConfig[$type];
+        if (is_string($conf) && !empty($conf)) {
+            $addPrefix = $conf;
+        } elseif (!empty($conf['urlPrefix'])) {
+            $addPrefix = $conf['urlPrefix'];
+        }
+        $urlPrefix = $addPrefix . (empty($urlPrefix) ? '' : ('/' . $urlPrefix));
+
+        $module = $module->module;
+        if (!empty($module) && $module instanceof UniModule && !empty($module->routesConfig[$type])) {
+            return static::correctUrlPrefix($urlPrefix, $module, $type);
+        }//var_dump($urlPrefix);
+        return $urlPrefix;
+    }
+
+    /**
+     * Create routes filename of routes $type for $module.
+     * @param yii\base\Module $module
+     * @param yii\base\Module $module
+     * @param string $type
+     * @see BaseModule::getRoutesFilename()
+     * This method will use for standard Yii2-modules (non-BaseModule).
+     */
+    public static function getRoutesFilename($module, $type)
+    {//echo __METHOD__."({$module->className()}, $type)<br>";
+        $class = new \ReflectionClass($module);
+        $dirname = dirname($class->getFileName());
+        $baseFileName = sprintf(BaseModule::$patternRoutesFilename, $type);
+        $routesSubdir = $dirname . DIRECTORY_SEPARATOR . static::$configsSubdir;
+        $file = $routesSubdir . '/' . $baseFileName;//echo "file='$file'<br>";
+        if (is_file($file)) {//echo "- found routes config: '$file'<br>";
+            return $file;
+        }
+        if ($module instanceof self) {//exit;
+            throw new \Exception("Routes list file '{$baseFileName}' not found in config(s) folder(s) for module " . $module->className());
+        } else {
+            return false;
+        }
+    }
+
+}

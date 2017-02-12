@@ -1,0 +1,23 @@
+{
+    "name": "asbsoft/yii2-common_2_170212",
+    "description": "Experimental common Yii2 extensions for ASB-projects",
+    "keywords": ["yii2", "extensions"],
+    "type": "yii2-extension",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Alexandr Belogolovsky",
+            "email": "ab2014box@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "yiisoft/yii2": ">=2.0.7",
+        "lafeber/world-flags-sprite": "*",
+    },
+    "autoload": {
+        "psr-4": {
+            "asb\\yii2\\": ""
+        }
+    }
+}
