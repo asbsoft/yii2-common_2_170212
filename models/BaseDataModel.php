@@ -11,7 +11,7 @@ use yii\helpers\Inflector;
 /**
  * Base data model.
  *
- * NB! Can't support now composite primary key.
+ * NB! Can't support now some functions for composite primary key.
  *
  * @author ASB <ab2014box@gmail.com>
  */
@@ -19,9 +19,6 @@ class BaseDataModel extends ActiveRecord
 {
     /** Module-container for this model */
     public $module;
-
-    /** Module's config */
-    //public $config = []; //deprecated
 
     /** Common translation category for all module */
     public $tcModule = '';
@@ -42,25 +39,11 @@ class BaseDataModel extends ActiveRecord
     /**
      * @inheritdoc
      */
-/*
-    public function __construct($config = [])
-    {//var_dump($config);
-        parent::__construct($config);
-    }
-*/
-
-    /**
-     * @inheritdoc
-     */
     public function init()
     {//echo __METHOD__.'<br>';
         parent::init();
 
         if (empty($this->module)) {
-            //throw new \Exception("Model {$this::className()} must have module attribute");//!!
-
-            //$class = $this::className();
-            //$modelNamespace = substr($class, 0, strrpos($class, '\\'));
             $rc = new \ReflectionClass($this);
             $modelNamespace = $rc->getNamespaceName();//var_dump($modelNamespace);
             $moduleNamespace = substr($modelNamespace, 0, strrpos($modelNamespace, '\\'));
@@ -78,6 +61,10 @@ class BaseDataModel extends ActiveRecord
                 }
             }
         }//var_dump($this->module);exit;
+
+        if (empty($this->module)) {
+            throw new \Exception("Model {$this::className()} must have 'module' attribute");
+        }
 
         $this->prepare();
     }
@@ -103,8 +90,9 @@ class BaseDataModel extends ActiveRecord
 
     /**
      * @inheritdoc
-     * Sometime need clear table name without enclosure '{{%...}}'.
-     * Use class constant TABLE_NAME for clean table name.
+     * You can use class constant TABLE_NAME
+     * for define base (without prefix) table name
+     * instead of definition method tableName().
      */
     public static function tableName()
     {
@@ -114,6 +102,28 @@ class BaseDataModel extends ActiveRecord
         } else {
             return parent::tableName();
         }
+    }
+
+    /**
+     * Returns actual name of table associated with this AR class (with prefix).
+     * @return string
+     */
+    public static function rawTableName()
+    {
+        $tableName = static::tableName();
+        $rawName = static::getDb()->schema->getRawTableName($tableName);
+        return $rawName;
+    }
+
+    /**
+     * Returns base (without prefix) name of table associated with this AR class.
+     * @return string
+     */
+    public static function baseTableName()
+    {
+        $tableName = static::tableName();
+        $cleanName = preg_replace('/{{%(.*?)}}/', '\1', $tableName);
+        return $cleanName;
     }
 
     /**
