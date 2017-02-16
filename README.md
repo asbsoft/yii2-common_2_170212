@@ -17,6 +17,9 @@ Development in progress...
 
 Notes
 -----
+* Don't forget to make you own config files in config/ folder.
+  See *EXAMPLES.php files.
+
 * To work with views inherinance:
   - add to application config in 'components' => [ //...
       'view' => [
@@ -24,3 +27,4 @@ Notes
       ],
   - controllers must extend asb\yii2\common_2_170212\controllers\BaseController or BaseAdminController
 
+//...toDo
