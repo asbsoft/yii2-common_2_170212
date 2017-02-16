@@ -101,7 +101,6 @@ class BaseConfigsBuilder extends Component
 
             if ($class->name == YiiBaseModule::className()) break;
             if ($class->name == UniModule::className()) break;
-            //if ($class->name == CmsModule::className()) break;
             if ($class->name == $app::className()) break;
             //if ($class->name == __CLASS__) break;
         }//echo 'result config:';var_dump($config);

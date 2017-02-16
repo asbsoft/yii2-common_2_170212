@@ -2,10 +2,6 @@
 
 namespace asb\yii2\common_2_170212\web;
 
-use asb\yii2\common_2_170212\web\CmsUrlRule;
-use asb\yii2\common_2_170212\web\RedirectUrlRule;
-use asb\yii2\common_2_170212\web\ContentUrlRule;
-
 use Yii;
 use yii\web\GroupUrlRule;
 use yii\web\UrlRule as WebUrlRule;
@@ -33,10 +29,6 @@ class RoutesInfo
                 $result .= static::showRoute($rule);
             } else {
                 switch ($rule::className()) {
-                    case WebUrlRule::className():
-                    case CmsUrlRule::className()://var_dump($rule->route);
-                        if (0 === strpos($rule->route, $moduleUid)) $result .= static::showRoute($rule);
-                    break;
                     case GroupUrlRule::className():
                         foreach ($rule->rules as $singleRule) {//var_dump($singleRule->route);
                             if (0 === strpos($singleRule->route, $moduleUid)) {
@@ -44,7 +36,7 @@ class RoutesInfo
                                 break;
                             }
                         }
-                    break;
+                        break;
                     case RestUrlRule::className():
                         if (is_array($rule->controller)) {
                             $urlPrefix = array_keys($rule->controller)[0];
@@ -52,8 +44,15 @@ class RoutesInfo
                         } else {
                             $controller = $rule->controller;
                         }//var_dump($controller);
-                        if (0 === strpos($controller, $moduleUid)) $result .= static::showRoute($rule);
-                    break;
+                        if (0 === strpos($controller, $moduleUid)) {
+                            $result .= static::showRoute($rule);
+                        }
+                        break;
+                    default:
+                        if (0 === strpos($rule->route, $moduleUid)) {
+                            $result .= static::showRoute($rule);
+                        }
+                        break;
                 }
            }
         }
@@ -78,7 +77,7 @@ class RoutesInfo
                 $result .= "'" . htmlspecialchars($rule->pattern) . "'"
                    . " => '" . htmlspecialchars($rule->route) . "'"
                    . " ({$rule::className()})"
-                   . '<br>'
+                   . "\n"
                    ;
                 break;
             case GroupUrlRule::className():
@@ -90,7 +89,7 @@ class RoutesInfo
                        . ' => '
                      //. "'" . $rule->routePrefix . '/'
                        . "'" . htmlspecialchars($singleRule->route) . "'"
-                       . '<br>'
+                       . "\n"
                        ;
                 }
                 break;
@@ -110,31 +109,22 @@ class RoutesInfo
                        . '/' . htmlspecialchars($urlPrefix) . '/'
                        . htmlspecialchars($template) . htmlspecialchars($rule->suffix) . "'"
                        . " => '" . $controller . '/' . htmlspecialchars($action) . "'"
-                       . '<br>'
+                       . "\n"
                        ;
                 }
                 break;
-            case ContentUrlRule::className()://var_dump($rule);exit;
-                $result .= "{$rule::className()}:<br>";
-                $result .= "\t pattern = '" . $rule->pattern . "'<br>";
-                $result .= "\t content alias = '" . $rule->alias . "'<br>";
-                break;
-            case RedirectUrlRule::className():
-                $result .= "{$rule::className()}:<br>";
-                $result .= "\t pattern = '" . $rule->pattern . "'<br>";
-                $result .= "\t link = '" . $rule->link . "'<br>";
-                break;
-            case CmsUrlRule::className():
-                $result .= "{$rule::className()}:<br>";
-                $result .= " '{$rule->pattern}' => '{$rule->route}'<br>";
-                $result .= "  + layout = '" . $rule->layout . "'<br>";
-                break;
             default:
                 $result .= "{$rule::className()}:<br>";
-                ob_start();
-                ob_implicit_flush(false);
-                var_dump($rule);//?!
-                $result .= ob_get_clean();
+                if (method_exists($rule, 'showRouteInfo')) {
+                    $info = $rule->showRouteInfo();
+                    $strings = explode("\n", trim($info));
+                    foreach ($strings as $str) $result .= " + " . trim($str) . "\n";
+                } else {
+                    ob_start();
+                    ob_implicit_flush(false);
+                    var_dump($rule);
+                    $result .= ob_get_clean();
+                }
                 break;
         }
         if ($echo) {
