@@ -5,31 +5,10 @@ use asb\yii2\common_2_170212\rbac\IsAdminRule;
 
 use yii\db\Migration;
 
+//Yii::setAlias('@asb/yii2/common_2_170212', '@vendor/asbsoft/yii2-common_2_170212'); // uncomment if need
+
 class m160524_092000_add_roles_root_admin extends Migration
 {
-    public function init()
-    {
-        parent::init();
-
-        //Yii::setAlias('@asb/yii2/common_2_170212', '@vendor/asbsoft/yii2-common_2_170212');
-        Yii::setAlias('@asb/yii2/cms_3_170211', '@vendor/asbsoft/yii2-cms_3_170211');
-        Yii::setAlias('@asb/yii2/modules', '@vendor/asbsoft/yii2module');
-    }
-
-/*
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m160524_092000_addroles_root_admin cannot be reverted.\n";
-
-        return false;
-    }
-*/
-    // Use safeUp/safeDown to run migration code within a transaction
     public function safeUp()
     {
         $auth = Yii::$app->authManager;
