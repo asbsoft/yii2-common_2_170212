@@ -155,58 +155,11 @@ class UniBaseModule extends BaseModule
 
     /**
      * @inheritdoc
-     *
-     * For bootstraping nested modules you can add to parent-container module's config short moduleId
-     * 'bootstap' => [..., '(nextSubmoduleShortId)', ...]
-     * It is similar to add Yii::$app->bootstrap[] = 'moduleUniqueId'
-     * but you can't know full unique id for this submodule here.
-     *
-     * You can change inheritance of you submodule from yii\bas\Module to UniModule.
-     * For properly bootstrap of Bootstrap class in nested module you can use
-     * ```php
-     *   class Module extends UniModule {
-     *       public function bootstrap($app) {
-     *           Yii::createObject(Bootstrap::className())->bootstrap($app);
-     *           parent::bootstrap($app);
-     *       }
-     *   }
-     * ```
-     * without manual add this Bootstrap class to Yii::$app->bootstrap.
-     *
      */
     public function bootstrap($app)
-    {//echo __METHOD__."@{$this::className()}({$this->uniqueId})<br>";//var_dump($this->bootstrap);var_dump(static::$_bootstrappedModules);
-        if (!$this->noname && empty(static::$_bootstrappedModules[$this->uniqueId])) {
-            static::$_bootstrappedModules[$this->uniqueId] = true;
-
-            TranslationsBuilder::initTranslations($this);//var_dump($this->templateTransCat);
-            static::$tc = $this->tcModule;
-
-            $this->addRoutes();
-
-            // such as in yii\base\Application
-            foreach ($this->bootstrap as $class) {//var_dump($class);exit;
-                $component = null;
-                if (is_string($class)) {
-                    if ($this->has($class)) {
-                        $component = $this->get($class);
-                    } elseif ($this->hasModule($class)) {
-                        $component = $this->getModule($class);
-                    } elseif (strpos($class, '\\') === false) {
-                        throw new InvalidConfigException("Unknown bootstrapping component ID: $class");
-                    }
-                }
-                if (!isset($component)) {
-                    $component = Yii::createObject($class);
-                }
-
-                if ($component instanceof BootstrapInterface) {
-                    Yii::trace('Bootstrap with ' . get_class($component) . '::bootstrap()', __METHOD__);
-                    $component->bootstrap($app);
-                } else {
-                    Yii::trace('Bootstrap with ' . get_class($component), __METHOD__);
-                }
-            }
+    {
+        if (!$this->noname) {
+            parent::bootstrap($app);
         }
     }
 

@@ -2,6 +2,8 @@
 
 namespace asb\yii2\common_2_170212\base;
 
+use asb\yii2\common_2_170212 as asbcommon;
+
 use asb\yii2\common_2_170212\web\RoutesBuilder;
 use asb\yii2\common_2_170212\web\RoutesInfo;
 use asb\yii2\common_2_170212\i18n\TranslationsBuilder;
@@ -41,7 +43,9 @@ class BaseModule extends Module
     /** Default routes subdir in module */
     public static $patternRoutesFilename = 'routes-%s.php';
 
-    /** Start of translation category */
+    /** Common module translation category, must be copy of $tcModule */
+    public static $tc = 'app';
+    /** Start (prefix) of translation category */
     public $baseTransCategory;
     /** Module translations category template, usually 'MODULE_ID*' */
     public $templateTransCat = '';
@@ -51,8 +55,6 @@ class BaseModule extends Module
     public $tcControllers = '';
     /** Translation category common for all module */
     public $tcModule = '';
-    /** Common module translation category, must be copy of $tcModule */
-    public static $tc = 'app';
 
     /**
      * Routes configurations according to applications types:
@@ -65,6 +67,12 @@ class BaseModule extends Module
      * In array only key 'urlPrefix' is must.
      */
     public $routesConfig = [];
+
+    /** 
+     * @var array list of submodules that should be run during the bootstrapping process like in Application.
+     * @see \yii\base\Application::$bootstrap
+     */
+    public $bootstrap = [];
 
     /** Module type */
     protected $_type;
@@ -279,6 +287,65 @@ class BaseModule extends Module
             return static::$_startLinks[$moduleUid][$routesType];
         }
         return false;
+    }
+
+    /** Array of already bootstrapped modules in format module's uniqueId => true */
+    protected static $_bootstrappedModules = [];
+    /**
+     * @inheritdoc
+     *
+     * For bootstraping nested modules you can add to parent-container module's config short moduleId
+     * 'bootstap' => [..., '(nextSubmoduleShortId)', ...]
+     * It is similar to add Yii::$app->bootstrap[] = 'moduleUniqueId'
+     * but you can't know full unique id for this submodule here.
+     *
+     * You can change inheritance of you submodule from yii\base\Module to asb\yii2\...\base\BaseModule.
+     * For properly bootstrap of Bootstrap class in nested module you can use
+     * ```php
+     *   class Module extends BaseModule {
+     *       public function bootstrap($app) {
+     *           Yii::createObject(Bootstrap::className())->bootstrap($app);
+     *           parent::bootstrap($app);
+     *       }
+     *   }
+     * ```
+     * without manual add this Bootstrap class to Yii::$app->bootstrap.
+     *
+     */
+    public function bootstrap($app)
+    {//echo __METHOD__."@{$this::className()}({$this->uniqueId})<br>";//var_dump($this->bootstrap);var_dump(static::$_bootstrappedModules);
+        if (empty(static::$_bootstrappedModules[$this->uniqueId])) {
+            static::$_bootstrappedModules[$this->uniqueId] = true;
+
+            TranslationsBuilder::initTranslations($this);//var_dump($this->templateTransCat);
+            static::$tc = $this->tcModule;
+
+            $this->addRoutes();
+
+            // bootstrap submodules such as in yii\base\Application
+            foreach ($this->bootstrap as $class) {//var_dump($class);exit;
+                $component = null;
+                if (is_string($class)) {
+                    if ($this->has($class)) {
+                        $component = $this->get($class);
+                    } elseif ($this->hasModule($class)) {
+                        $component = $this->getModule($class);
+                    } elseif (strpos($class, '\\') === false) {
+                        throw new InvalidConfigException("Unknown bootstrapping component ID: $class");
+                    }
+                }
+                if (!isset($component)) {
+                    $component = Yii::createObject($class);
+                }
+
+                if ($component instanceof BootstrapInterface) {
+                    Yii::trace('Bootstrap with ' . get_class($component) . '::bootstrap()', __METHOD__);
+                    $component->bootstrap($app);
+                } else {
+                    Yii::trace('Bootstrap with ' . get_class($component), __METHOD__);
+                }
+            }
+        }
     }
 
 }
