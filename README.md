@@ -40,3 +40,33 @@ Notes
   asb\yii2\common_2_170212\i18n\LangHelper and bootstraping by asb\yii2\common_2_170212\base\CommonBootstrap.
 
 * Other functionality is optional.
+
+Using modules inheritance
+-------------------------
+* Extends your ancestor module from base\UniModule.
+  You can create another module with module class in root directory extends of ancestor module class.
+  Than add this module as submodule to config of application or another module-container.
+
+* Now work such features:
+  - configs and params will merge with ancestor's data
+  - messages will merge
+  - for route(s) get latest file(s) 
+  - for view(s) get latest file(s) - possible to redefine only required file(s)
+  - controllers and models - traditional inheritance
+  - to use models inheritans you have to (re)define using models in config/config.php of module
+    in format alias => class name or object array:
+      'models' => [..., 'ALIAS' => 'VENDOR\yii2\modules\MODULE_NAME\models\News', ...]
+    for example
+      'News' => 'asb\yii2\modules\news_1\models\News', // in module-ancestor
+      'News' => 'asb\yii2\modules\news_2\models\News', // in module-child
+    and for access to model you have to use everywhere (only for models in modules extends UniModule):
+    - $module->getDataModel($alias, $params = [], $config = []) // get and init module object
+      or same static method: ModuleClassName::model($alias, $params = [], $config = [])
+  - to use assets inheritans you have to (re)define using assetss in config/config.php of module
+    in format alias => class name:
+      'models' => [..., 'ALIAS' => 'CLASSNAME', ...]
+    and in view use $assets = $this->context->module->registerAsset('MyAsset', $this);
+    instead of $assets = MyAsset::register($this);
+    and in new asset better use old asset as 'depends' not as a child -
+    new CSS-files will include after and will redefine old styles
+

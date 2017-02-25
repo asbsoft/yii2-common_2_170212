@@ -39,14 +39,6 @@ class UniBaseModule extends BaseModule
     public $dependencies = [];
     
     /** 
-     * @var array list of module's components that should be run during the bootstrapping process like in Application.
-     * @see \yii\base\Application::$bootstrap
-     */
-    public $bootstrap = [];
-    /** Array in format module's uniqueId => true */
-    protected static $_bootstrappedModules = [];
-
-    /** 
      * @inheritdoc
      */
     public function __construct($id, $parent = null, $config = [])
@@ -545,17 +537,18 @@ var_dump($moduleContainer);exit;
     /** Data models defined in config params: 'ALIAS' => 'CLASS' */
     protected $_models = [];
     protected function getModels() {return $this->_models;}
-    /** Save models classNames with aliases geting from config */
+    /** Save models classnames with aliases geting from config */
     protected function setModels($config)
-    {//echo __METHOD__;var_dump($config);
+    {
         foreach ($config as $alias => $className) {
             $this->_models[$alias] = $className;
-        }//var_dump($this->_models);exit;
+        }
     }
     /**
-     * Get model's className by it's alias defined in module's config.
+     * Get model's class name by it's alias defined in module's config.
      * @param string $alias
-     * @return string className
+     * @return string class name
+     * @throws Exception if the alias not found.
      */
     public function getModelClassname($alias)
     {
@@ -564,18 +557,31 @@ var_dump($moduleContainer);exit;
         }
         return $this->_models[$alias];
     }
+    /**
+     * Get model's class name by it's alias defined in module's config.
+     * @param string $alias
+     * @return string|null class name
+     * @see getModelClassname()
+     */
+    public static function modelClassname($alias)
+    {
+        $module = static::instance();
+        if (!empty($module)) {
+            return $module->getModelClassname($alias);
+        }
+    }
 
     /**
-     * Get object of data model by alias defined in config.
-     * @param string $alias
+     * Get object of data model by alias defined in module's config.
+     * @param string $alias model's alias
      * @param array $params constructor parameters
-     * @param array $config
+     * @param array $config config parameters
      * @return yii\base\Model
      */
     public function getDataModel($alias, $params = [], $config = [])
     {//echo __METHOD__."({$alias})@".$this::className().'<br>';var_dump($this->_models);
         if (!empty($this->_models[$alias])) {
-            //$model = new $this->models[$alias](['module' => $this]); // only for asb\yii2\common_2_170212\models\DataModel
+            //$model = new $this->models[$alias](['module' => $this]); // only for asb\yii2\models\DataModel
             $model = Yii::createObject($this->models[$alias], $params);
             if ($model instanceof DataModel) {
                 //$model->module = $this;
@@ -615,7 +621,7 @@ var_dump($moduleContainer);exit;
             //return new $modelFullName();
 /*
             return Yii::createObject($modelFullName
-              , ['module' => $thisModule] // ignore if model not instanceof asb\yii2\common_2_170212\models\DataModel
+              , ['module' => $thisModule] // ignore if model not instanceof asb\yii2\models\DataModel
             );
 */
             $model = Yii::createObject($modelFullName, $params);
@@ -647,14 +653,44 @@ var_dump($moduleContainer);exit;
             return $module->getDataModel($alias, $params, $config);
         }
     }
-    //public static function dataModel($alias) { return static::model($alias); }
-    public static function modelClassname($alias)
+    //public static function dataModel($alias) { return static::model($alias); } // deprecated
+//--- END of functionality to access models of module
+
+    /** Assets defined in config params: 'ALIAS' => 'CLASS' */
+    protected $_assets = [];
+    protected function getAssets() {return $this->_assets;}
+    /** Save assets classnames with aliases geting from config */
+    protected function setAssets($config)
+    {
+        foreach ($config as $alias => $className) {
+            $this->_assets[$alias] = $className;
+        }
+    }
+    /**
+     * Get asset's class name by it's alias defined in module's config.
+     * @param string $alias
+     * @return string class name
+     * @throws Exception if the alias not found.
+     */
+    public function getAssetClassname($alias)
+    {
+        if (empty($this->_assets[$alias])) {
+            throw new \Exception("Asset '{$alias}' not found in configuration of module " . static::className());
+        }
+        return $this->_assets[$alias];
+    }
+    /**
+     * Registers this asset bundle with a view.
+     * @param string $alias
+     * @param yii\web\View $view the view to be registered with
+     * @return static|null the registered asset bundle instance
+     */
+    public static function registerAsset($alias, $view)
     {
         $module = static::instance();
         if (!empty($module)) {
-            return $module->getModelClassname($alias);
+            $class = $module->getAssetClassname($alias);
+            return $class::register($view);
         }
     }
-//--- END of functionality to access models of module
-
 }
