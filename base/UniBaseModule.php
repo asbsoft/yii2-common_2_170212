@@ -10,11 +10,13 @@ use asb\yii2\common_2_170212\i18n\TranslationsBuilder;
 use asb\yii2\common_2_170212\models\DataModel;
 use asb\yii2\common_2_170212\web\RoutesInfo;
 
+use asb\yii2\common_2_170212\helpers\ArrayHelper;
+
 use Yii;
 use yii\base\Module as YiiBaseModule;
 use yii\base\BootstrapInterface;
 use yii\base\Controller as YiiBaseController;
-use yii\helpers\ArrayHelper;
+//use yii\helpers\ArrayHelper;
 
 /**
  * United module. Base part.
@@ -73,8 +75,14 @@ class UniBaseModule extends BaseModule
 
         // $this->params from config may overwrite params from separate files:
         // get params from separate params-files
-        $addParams = $this->getParams();//var_dump($addParams);
-        $this->params = ArrayHelper::merge($addParams, $this->params);//var_dump($this->params);
+        $addParams = $this->getParams();//var_dump($addParams);var_dump($this->params);
+/*
+        $diff = @array_diff($addParams, $this->params);//var_dump($diff);
+        if (!empty($diff)) {
+            $this->params = ArrayHelper::merge($addParams, $this->params); //?! duplication elements with number keys detected
+        }//var_dump($this->params);
+*/
+        $this->params = ArrayHelper::mergeNoDouble($addParams, $this->params);
 
         // move to bootstrap:
         //if (!$this->noname) TranslationsBuilder::initTranslations($this);//var_dump($this->templateTransCat);
@@ -98,18 +106,22 @@ class UniBaseModule extends BaseModule
         if (!empty($result)) {
             return $result;
         } else {
+            // check inheritance of loaded modules
             $class = get_called_class();
-            $result = [];
+            $result = [];//var_dump(array_keys(Yii::$app->loadedModules));
             foreach (Yii::$app->loadedModules as $module) {
                 if ($module instanceof $class) {
                     $result[] = $module;
                 }
-            }
+            }//echo __METHOD__."@$class";var_dump($result);exit;
             if (count($result) == 1) {
                 return $result[0];
             } else {
-                //!! problem: found many loaded children of this module
+                $msg = "Problem: found many loaded children of module '{$class}' - can't select proper";
+                Yii::error($msg);
+                //throw new \Exception($msg);
                 //?? todo
+                //!! need to allow many children of one ancestor
             }
         }
     }
@@ -354,6 +366,8 @@ class UniBaseModule extends BaseModule
             return $result; // found from loaded
         }
 
+        //?? deprecated: never run here ...
+//*
         $uid = static::getModuleUidByClassname($moduleClassName);//var_dump($uid);
         if (!empty($uid)) {
             $result = Yii::$app->getModule($uid);//var_dump($result);
@@ -363,6 +377,7 @@ class UniBaseModule extends BaseModule
                 throw new \Exception("Module with uniqueId '{$uid}' was not registered in application");
             }
         }
+/**/
 
         $message = __METHOD__."($moduleClassName): Can't get module by classname '{$moduleClassName}'.";
         if (!$loadAnonimous) {
@@ -394,6 +409,7 @@ class UniBaseModule extends BaseModule
         return $result;
     }
 
+//?? deprecated
 //!! This method will load all modules in system if need.
 //todo cache
     /**
@@ -408,15 +424,15 @@ class UniBaseModule extends BaseModule
         if ($moduleContainer == null) {
             $moduleContainer = Yii::$app; // start from ancestor-container
         }
-
+/*
         if (is_array($moduleContainer)) {//
 echo __METHOD__."($moduleClassName,".(empty($moduleContainer)?'null':$moduleContainer->uniqueId).')<br>';
 var_dump($moduleContainer);exit;
 
-//todo...
+//todo... load
 
         }
-
+*/
         if ($moduleContainer instanceof YiiBaseModule) {
              if ($moduleContainer::className() == $moduleClassName) {
                  return $moduleContainer->uniqueId;
