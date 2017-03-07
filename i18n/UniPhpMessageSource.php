@@ -10,6 +10,9 @@ use asb\yii2\common_2_170212\i18n\TranslationsBuilder;
 use yii\i18n\PhpMessageSource;
 use yii\helpers\ArrayHelper;
 
+/**
+ * @author ASB <ab2014box@gmail.com>
+ */
 class UniPhpMessageSource extends PhpMessageSource
 {
     /** Loaded messages cache */

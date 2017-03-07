@@ -11,7 +11,7 @@ use yii\web\Cookie;
 use yii\web\Response;
 
 /**
- * Base lang helper.
+ * Lang helper.
  *
  * @author ASB <ab2014box@gmail.com>
  */

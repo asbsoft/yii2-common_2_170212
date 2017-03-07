@@ -12,8 +12,15 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "yiisoft/yii2": ">=2.0.7",
+        "yiisoft/yii2": "~2.0.10",
+
+        "yiisoft/yii2-jui": "*",
+        "yiisoft/yii2-imagine": "2.*",
+
         "lafeber/world-flags-sprite": "*",
+
+        "mihaildev/yii2-ckeditor": "*",
+        "mihaildev/yii2-elfinder": "*",
     },
     "autoload": {
         "psr-4": {

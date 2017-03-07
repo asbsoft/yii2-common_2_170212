@@ -36,8 +36,8 @@ class UserIdentity extends Model implements IdentityInterface //, ActiveRecordIn
         'userModuleUniqueId' => 'users', //?!
         'userManagerAlias'   => 'UserIdentity', // see UniModule::model($alias)
       //'usersConfigFname'   =>  dirname(__DIR__) . '/config/users-default.php', // error
-        'usersConfigFname'   => '@asb/yii2/config/users-default.php',
-        'rolesConfigFname'   => '@asb/yii2/config/roles-default.php',
+        'usersConfigFname'   => '@asb/yii2/common_2_170212/config/users-default.php',
+        'rolesConfigFname'   => '@asb/yii2/common_2_170212/config/roles-default.php',
     ];
 
     /**
@@ -81,7 +81,7 @@ class UserIdentity extends Model implements IdentityInterface //, ActiveRecordIn
      * Get users infos from file.
      * @return array
      */
-    public static function users()
+    protected static function users()
     {//echo __METHOD__;
         if (empty(static::$_users)) {
             static::$_users = include(Yii::getAlias(static::parameter('usersConfigFname')));
@@ -166,6 +166,9 @@ class UserIdentity extends Model implements IdentityInterface //, ActiveRecordIn
             }
         }
     }
+    /**
+     * Need if try to use this as ActiveRecord object.
+     */
     public static function __callStatic($name, $params)
     {//echo __METHOD__."($name)";var_dump($params);exit;
         $userIdentiry = static::moduleUserIdentity();
@@ -176,6 +179,34 @@ class UserIdentity extends Model implements IdentityInterface //, ActiveRecordIn
                 return parent::__call($name, $params);
             }
         }
+    }
+
+    protected static $_usersList;
+    /**
+     * @return array of users info
+     */
+    public static function usersList()
+    {
+        if (empty(self::$_usersList)) {
+            $userIdentiry = static::moduleUserIdentity();//echo __METHOD__;var_dump($userIdentiry);
+            if (empty($userIdentiry)) {
+                self::$_usersList = static::users();
+            } else if (method_exists($userIdentiry, 'usersList')) {
+                self::$_usersList = $userIdentiry->usersList();
+            } else {
+                throw new \Exception("Method 'usersList' expected in UserIdentity");
+            }
+        }//var_dump(self::$_usersList);exit;
+        return self::$_usersList;
+    }
+
+    /**
+     * @return array in format id => username
+     */
+    public static function usersNames()
+    {
+        $list = static::usersList();
+        return ArrayHelper::map($list, 'id', 'username');
     }
 
 }

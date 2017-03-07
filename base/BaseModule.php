@@ -16,6 +16,7 @@ use yii\helpers\Url;
 
 /**
  * Common base module.
+ *
  * @author ASB <ab2014box@gmail.com>
  */
 class BaseModule extends Module
@@ -62,7 +63,8 @@ class BaseModule extends Module
      * Another routesConfig parameters:
      *    'startLink' => array('label' => 'Text...', 'link'|'action' => '...')
      *                   (action is 'controller/actionId' without moduleId)
-     * or 'startLinkLabel' => 'Text...' (means 'link' => '' by default)
+     * or '
+     startLinkLabel' => 'Text...' (means 'link' => '' by default)
      *    - define start link with label
      * In array only key 'urlPrefix' is must.
      */
@@ -145,7 +147,7 @@ class BaseModule extends Module
      * System will use only latest routes, it not mix them with parents routes.
      */
     public function addRoutes()
-    {//echo static::className()."[{$this->uniqueId}]".'@'.__METHOD__.'()<br>';//var_dump($this->noname);
+    {//echo static::className()."[{$this->uniqueId}]".'@'.__METHOD__.'()<br>';
         $isNoname = $this instanceof UniModule ? $this->noname : false;
         if (!$isNoname && !empty($this->routesConfig)) {//var_dump($this->routesConfig);
             //$routesSubdir = $this->getRoutesPath();//var_dump($routesSubdir);
@@ -257,12 +259,14 @@ class BaseModule extends Module
         if (!empty($routeConfig['startLink'])) {//var_dump($routeConfig['startLink']);echo RoutesInfo::showRoutes($this->uniqueId);
             if (!empty($routeConfig['startLink']['action'])) {
                 $action = '/' . $routeConfig['moduleUid'] . '/' . $routeConfig['startLink']['action'];//var_dump($action);
+                $route = [$action];
                 $url = Url::toRoute($action);
             } elseif (isset($routeConfig['startLink']['link'])) {
                 $link = $routeConfig['startLink']['link'];//var_dump($link);
                 $link = '/' . $routeConfig['urlPrefix']
                        . ( ($link == '' || $link == '?') ? '' : ('/' . $link) )
                        ;//var_dump($link);
+                //$route = ??;
                 $url = Url::toRoute($link);
             } else {
                 throw new \Exception("Insufficient 'link' or 'action' in 'startLink' paremeter of routeConfig");
@@ -273,6 +277,8 @@ class BaseModule extends Module
                 'label' => Yii::t($tc, $routeConfig['startLink']['label']),
                 'link'  => $url,
             ];
+            if (isset($route)) $linkData['route'] = $route;
+
             static::$_startLinks[$this->uniqueId][$routeConfig['routesType']] = $linkData;//var_dump(static::$_startLinks);
         }
     }

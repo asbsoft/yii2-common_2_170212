@@ -6,18 +6,42 @@ use Yii;
 use yii\base\Object;
 
 /**
- * Content preprocessing for visual editor.
+ * Content preprocessing for visual editor:
+ * - correct real images links to aliases and back (need when system move, f.e. to subdir)
+ * - ...
  *
  * @author ASB <ab2014box@gmail.com>
  */
 class EditorContentHelper extends Object
 {
-    /** Prepare text to save after visual editor */
+    /** Subdirectory in web root of uploaded files or theirs mirrors */
+    public static $webfilesSubdir = 'files';
+
+    public static $webfilesSubdirOld = 'uploads'; // deprecated but already use in old versions
+    
+    /** Correct parameter(s) */
+    public static function correctParams()
+    {
+        if (!empty(Yii::$app->params['webfilesSubdir'])) {
+            static::$webfilesSubdir = Yii::$app->params['webfilesSubdir'];
+        }
+    }
+    
+    /**
+     * Prepare text to save after visual editor.
+     * @param string $text
+     * @return string 
+     */
     public static function beforeSaveBody($text)
     {
+        static::correctParams();
+        $webfilesSubdir = static::$webfilesSubdir;
+        $webfilesSubdirOld = static::$webfilesSubdirOld;
+
         $baseUrl = Yii::$app->urlManager->getBaseUrl();//var_dump($baseUrl);
         $tr_table = [
-            "src=\"{$baseUrl}/uploads" => "src=\"@uploads",
+            "src=\"{$baseUrl}/{$webfilesSubdirOld}" => "src=\"@{$webfilesSubdir}", //!! old -> new
+            "src=\"{$baseUrl}/{$webfilesSubdir}" => "src=\"@{$webfilesSubdir}",
 
 //...todo add useful here...
 
@@ -26,12 +50,21 @@ class EditorContentHelper extends Object
         return $text;
     }
 
-    /** Prepare text to show after get it from database */
+    /**
+     * Prepare text to show in editor after get it from database.
+     * @param string $text
+     * @return string 
+     */
     public static function afterSelectBody($text)
     {
+        static::correctParams();
+        $webfilesSubdir = static::$webfilesSubdir;
+        $webfilesSubdirOld = static::$webfilesSubdirOld;
+
         $baseUrl = Yii::$app->urlManager->getBaseUrl();//var_dump($baseUrl);
         $tr_table = [
-            "src=\"@uploads" => "src=\"{$baseUrl}/uploads",
+            "src=\"@{$webfilesSubdirOld}" => "src=\"{$baseUrl}/{$webfilesSubdir}", //!! old -> new
+            "src=\"@{$webfilesSubdir}" => "src=\"{$baseUrl}/{$webfilesSubdir}",
 
 //...todo add useful here...
 

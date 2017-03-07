@@ -8,6 +8,7 @@ use asb\yii2\common_2_170212\i18n\LangHelper;
 
 use Yii;
 use yii\base\BootstrapInterface;
+use yii\helpers\FileHelper;
 
 /**
  * Common system bootstrap.
@@ -16,13 +17,33 @@ use yii\base\BootstrapInterface;
  */
 class CommonBootstrap implements BootstrapInterface
 {
+    /** Defaul web files path from web root, can redefine in $app->params */
+    public $webfilesSubdir = 'files';
+    
     /**
      * @inheritdoc
      */
     public function bootstrap($app)
-    {//echo __METHOD__;
+    {
+        //Yii::setAlias('@uploads', '@webroot/uploads'); //!! deprecated: files should not be upload direct in web root
 
-        Yii::setAlias('@uploads', '@webroot/uploads');
+        // mirror of uploads files dir in web root
+        if (!empty($app->params['webfilesSubdir'])) $this->webfilesSubdir = $app->params['webfilesSubdir'];
+        Yii::setAlias('@webfilespath', rtrim(Yii::getAlias('@webroot/' . $this->webfilesSubdir), '/'));
+        Yii::setAlias('@webfilesurl',  rtrim(Yii::getAlias('@web/' . $this->webfilesSubdir), '/'));//var_dump(Yii::$aliases);exit;
+
+        // uploads path is common for all Yii2-templates and not placed in web root
+        if (empty($app->params['@uploadspath'])) {
+            Yii::setAlias('@uploadspath',  dirname($app->vendorPath) . '/uploads'); // default
+        } else {
+            Yii::setAlias('@uploadspath',  $app->params['@uploadspath']); // default
+        }//var_dump(Yii::$aliases);exit;
+
+        // create common uploads dir and it's mirror in web root
+        $dir = Yii::getAlias('@uploadspath');
+        if (!is_dir($dir)) @FileHelper::createDirectory($dir);
+        $dir = Yii::getAlias('@webfilespath');
+        if (!is_dir($dir)) @FileHelper::createDirectory($dir);
 
         //LangHelper::appendDefLangToHomeUrl($app);
 

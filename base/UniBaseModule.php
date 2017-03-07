@@ -75,7 +75,7 @@ class UniBaseModule extends BaseModule
 
         // $this->params from config may overwrite params from separate files:
         // get params from separate params-files
-        $addParams = $this->getParams();//var_dump($addParams);var_dump($this->params);
+        $addParams = $this->getParameters();//var_dump($addParams);var_dump($this->params);
 /*
         $diff = @array_diff($addParams, $this->params);//var_dump($diff);
         if (!empty($diff)) {
@@ -90,6 +90,12 @@ class UniBaseModule extends BaseModule
 
         if (empty(static::$_bootstrappedModules[$this->uniqueId])) {
             $this->bootstrap(Yii::$app);
+        }
+
+        // only after bootstrap:
+        $tc = TranslationsBuilder::getBaseTransCategory($this) . '/module';//echo"for {$this->uniqueId}";var_dump($tc);
+        if (!empty($this->params['label'])) {//var_dump(Yii::$app->language);//?? sometimes == 'en-US'
+            $this->params['label'] = Yii::t($tc, $this->params['label']);//var_dump($this->params['label']);
         }
         
         // debug show routes
@@ -162,6 +168,10 @@ class UniBaseModule extends BaseModule
      */
     public function bootstrap($app)
     {
+        // always make translations
+        TranslationsBuilder::initTranslations($this);//var_dump($this->templateTransCat);
+        static::$tc = $this->tcModule;
+
         if (!$this->noname) {
             parent::bootstrap($app);
         }
@@ -196,9 +206,16 @@ class UniBaseModule extends BaseModule
      * Syncronize and get module's params.
      * @return array
      */
-    public function getParams()
+    public function getParameters()
     {//echo $this::className().'::'.__FUNCTION__.'()<br>';
-        return $this->params = ConfigsBuilder::getConfig($this, 'params');
+        $params = ConfigsBuilder::getConfig($this, 'params');
+/*
+        $tc = TranslationsBuilder::getBaseTransCategory($this) . '/module';//echo"for {$this->uniqueId}";var_dump($tc);
+        if (!empty($params['label'])) {
+            $params['label'] = Yii::t($tc, $params['label']); // InvalidConfigException: Unable to locate message source for category
+        }
+*/
+        return $params;
     }
 
     /** Change controllers namespace to first exists in parents modules chain */
@@ -356,7 +373,8 @@ class UniBaseModule extends BaseModule
      * Find in loaded modules module by $className.
      * If not found create anonymous module - need for united modules to collect configs, etc.
      * @param string $moduleClassName full class name with namespace
-     * @param boolean $loadAnonimous set true to always return module object even if not connect to any another modyule (with random id)
+     * @param boolean $loadAnonimous set true to always return module object even if not connect to any another module (with random id)
+     * Amonimous loading need for example in modules manager to load and analize module not add to system yet.
      * @return Module object
      */
     public static function getModuleByClassname($moduleClassName, $loadAnonimous = false)
@@ -399,7 +417,7 @@ class UniBaseModule extends BaseModule
                 if ($result instanceof static) { // need to prepare default UniBaseModule configs
                     $config = ConfigsBuilder::getConfig($result);//var_dump($result->config);exit;
                     Yii::configure($result, $config);
-                    $addParams = $result->getParams(); // from params-files
+                    $addParams = $result->getParameters(); // from params-files
                     $result->params = ArrayHelper::merge($addParams, $result->params);
                 }
                 static::$_nonameModules[$moduleClassName] = $result;//var_dump(static::$_nonameModules[$moduleClassName]);

@@ -15,6 +15,8 @@ Notes
 -----
 * Add to system all dependencies defined in "require" part of composer.json.
 
+* Use autoload.php here to register additional autoloads.
+
 * Register namespace \asb\yii2\common_2_170212 in system by composer or manually by define alias
   Yii::setAlias('@asb/yii2/common_2_170212', '@vendor/asbsoft/yii2-common_2_170212');
   This definition you can place in index.php, most common config(s)

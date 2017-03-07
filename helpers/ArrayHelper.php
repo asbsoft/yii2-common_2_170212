@@ -4,6 +4,9 @@ namespace asb\yii2\common_2_170212\helpers;
 
 use yii\helpers\ArrayHelper as BaseArrayHelper;
 
+/**
+ * @author ASB <ab2014box@gmail.com>
+ */
 class ArrayHelper extends BaseArrayHelper
 {
     /**
