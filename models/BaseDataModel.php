@@ -212,4 +212,22 @@ class BaseDataModel extends ActiveRecord
         return $result;
     }
 
+    /**
+     * Convert query's orderBy in array format [field => direction]
+     * to 'sort' parameter for URL in format '[-]fieldName',
+     * Consider only first element in array.
+     */
+    public function orderByToSort()
+    {//echo __METHOD__;var_dump($this->orderBy);
+        $sort = '';
+        if (empty($this->orderBy) || !is_array($this->orderBy)) {
+            return $sort;
+        }
+        foreach ($this->orderBy as $field => $direction) {
+            $sort = ($direction == SORT_DESC ? '-' : '') . $field;
+            break;
+        }//var_dump($sort);exit;
+        return $sort;
+    }
+
 }
