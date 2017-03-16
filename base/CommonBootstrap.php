@@ -30,7 +30,7 @@ class CommonBootstrap implements BootstrapInterface
         // mirror of uploads files dir in web root
         if (!empty($app->params['webfilesSubdir'])) $this->webfilesSubdir = $app->params['webfilesSubdir'];
         Yii::setAlias('@webfilespath', rtrim(Yii::getAlias('@webroot/' . $this->webfilesSubdir), '/'));
-        Yii::setAlias('@webfilesurl',  rtrim(Yii::getAlias('@web/' . $this->webfilesSubdir), '/'));//var_dump(Yii::$aliases);exit;
+        Yii::setAlias('@webfilesurl',  rtrim(Yii::getAlias('@web/' . $this->webfilesSubdir), '/'));//var_dump(Yii::$aliases);//exit;
 
         // uploads path is common for all Yii2-templates and not placed in web root
         if (empty($app->params['@uploadspath'])) {

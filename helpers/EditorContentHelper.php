@@ -39,14 +39,14 @@ class EditorContentHelper extends Object
         $webfilesSubdirOld = static::$webfilesSubdirOld;
 
         $baseUrl = Yii::$app->urlManager->getBaseUrl();//var_dump($baseUrl);
-        $tr_table = [
+        $trTable = [
             "src=\"{$baseUrl}/{$webfilesSubdirOld}" => "src=\"@{$webfilesSubdir}", //!! old -> new
             "src=\"{$baseUrl}/{$webfilesSubdir}" => "src=\"@{$webfilesSubdir}",
 
 //...todo add useful here...
 
-        ];
-        $text = strtr($text, $tr_table);//echo __METHOD__;var_dump($text);
+        ];//var_dump($trTable);exit;
+        $text = strtr($text, $trTable);//echo __METHOD__;var_dump($text);
         return $text;
     }
 
@@ -62,14 +62,14 @@ class EditorContentHelper extends Object
         $webfilesSubdirOld = static::$webfilesSubdirOld;
 
         $baseUrl = Yii::$app->urlManager->getBaseUrl();//var_dump($baseUrl);
-        $tr_table = [
+        $trTable = [
             "src=\"@{$webfilesSubdirOld}" => "src=\"{$baseUrl}/{$webfilesSubdir}", //!! old -> new
             "src=\"@{$webfilesSubdir}" => "src=\"{$baseUrl}/{$webfilesSubdir}",
 
 //...todo add useful here...
 
-        ];
-        $text = strtr($text, $tr_table);//echo __METHOD__;var_dump($text);
+        ];//var_dump($trTable);
+        $text = strtr($text, $trTable);//echo __METHOD__;var_dump($text);
         return $text;
     }
 

@@ -29,14 +29,14 @@ class UniErrorHandler extends ErrorHandler
     {//echo __METHOD__;var_dump($exception);exit;
 
         // non-existent files processing
-        if ($exception->statusCode == 404) {
+        if (isset($exception->statusCode) && $exception->statusCode == 404) {
             $fileUrl = Yii::$app->request->pathInfo;
             $homeUrl = trim(Yii::$app->homeUrl, '/');
             if (!empty($homeUrl)) $fileUrl = $homeUrl . '/' . $fileUrl;//var_dump($fileUrl);exit;
 
             $webFile = new WebFile($fileUrl, [
                 'uploadsDirectCopy' => empty(Yii::$app->params['uploadsDirectCopy']) ? false : Yii::$app->params['uploadsDirectCopy'],
-                'badImage' => dirname(__DIR__) . '/assets/img/bad-image.jpg',
+                'badImage' => dirname(__DIR__) . '/assets/common/img/bad-image.jpg',
             ]);
             $result = $webFile->synchronize();
             if ($result === true) { // file copied - send it

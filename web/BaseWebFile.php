@@ -17,7 +17,7 @@ use yii\helpers\FileHelper;
 class BaseWebFile extends Object
 {
     /** Path to image to show instead of bad image */
-    public $badImage = '@webroot/img/bad-image.jpg'; // default
+    public $badImage = '@webroot/img/bad-image.jpg'; // default, can redefine when create this Object
 
     public $allowedExtensions = ['gif', 'png', 'jpeg', 'jpg'];
     

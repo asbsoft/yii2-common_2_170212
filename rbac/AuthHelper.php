@@ -10,6 +10,8 @@ use yii\base\Controller as YiiBaseController;
 use yii\helpers\Inflector;
 use yii\filters\AccessControl;
 
+use Exception;
+
 /**
  * Authorization helper.
  *
@@ -75,7 +77,7 @@ class AuthHelper extends Object
 
         $parts = explode('/', $actionUid);//var_dump($parts);
         if ($parts === false || count($parts) < 3) {
-            throw new \Exception("Illegal action uniqueId format: '{$actionUid}'");
+            throw new Exception("Illegal action uniqueId format: '{$actionUid}'");
         } else {
             $actionId = array_pop($parts);
             $controllerId = array_pop($parts);
@@ -83,13 +85,13 @@ class AuthHelper extends Object
 
             $module = Yii::$app->getModule($moduleUid);//var_dump($module::className());
             if (empty($module)) {
-                //throw new \Exception("Can't get module '{$moduleUid}'");
+                //throw new Exception("Can't get module '{$moduleUid}'");
                 return false;
             } else {
                 $controller = $module->createControllerByID($controllerId);
                 if ($controller instanceof YiiBaseController) {
                     //static::$_modulesControllers[$moduleUid][$controllerId] = $controller::className();
-                    $behaviors = $controller->behaviors();//var_dump($behaviors);
+                    $behaviors = $controller->behaviors();
                     if (empty($behaviors['access']['rules'])) {
                         $rules = [];
                     } else {
@@ -97,7 +99,7 @@ class AuthHelper extends Object
                     }//var_dump($rules);
                     //static::$_accessRules[$moduleUid][$controllerId] = $rules;
                 } else {//var_dump($controller);exit;
-                    throw new \Exception("Illegal controller '{$controllerId}' in module '{$moduleUid}'");
+                    throw new Exception("Illegal controller '{$controllerId}' in module '{$moduleUid}'");
                 }
             }
 
@@ -111,9 +113,11 @@ class AuthHelper extends Object
                 foreach ($ac->rules as $rule) {
                     if ($rule->allows($action, $user, $request)) {//echo'allow by rule:';var_dump($rule);
                         $result = true; // found allow rule
+                        break;
                     }
-                }//var_dump($result);exit;
-            }
+                }
+            }//var_dump($result);
+
             return $result;
         }
     }

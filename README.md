@@ -11,6 +11,7 @@ Yii2 has two applications template - basic and advanced.
 To satisfy both need more complicated configs which too many in Yii2.
 I will prepare examples of applications configs...
 
+
 Notes
 -----
 * Add to system all dependencies defined in "require" part of composer.json.
@@ -18,15 +19,15 @@ Notes
 * Use autoload.php here to register additional autoloads.
 
 * Register namespace \asb\yii2\common_2_170212 in system by composer or manually by define alias
-  Yii::setAlias('@asb/yii2/common_2_170212', '@vendor/asbsoft/yii2-common_2_170212');
+  f.e. Yii::setAlias('@asb/yii2/common_2_170212', '@vendor/asbsoft/yii2-common_2_170212');
   This definition you can place in index.php, most common config(s)
   or better way in @vendor/yiisoft/extensions.php to provide work
   in any of basic/frontend/backend/console application.
 
-* Run migrations.
-
 * Make you own config files in config folder.
   Use *.EXAMPLES.php files as examples.
+
+* Run migrations.
 
 * To use additional functionality need to extends modules from \asb\yii2\common_2_170212\base\UniModule,
   controllers - from \asb\yii2\common_2_170212\controllers\BaseController and BaseAdminController,
@@ -41,7 +42,6 @@ Notes
 * Extension also has some functionality for switching multilanguage support provide by
   asb\yii2\common_2_170212\i18n\LangHelper and bootstraping by asb\yii2\common_2_170212\base\CommonBootstrap.
 
-* Other functionality is optional.
 
 Using modules inheritance
 -------------------------
@@ -71,4 +71,5 @@ Using modules inheritance
     instead of $assets = MyAsset::register($this);
     and in new asset better use old asset as 'depends' not as a child -
     new CSS-files will include after and will redefine old styles
+
 
