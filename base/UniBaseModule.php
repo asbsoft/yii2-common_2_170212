@@ -18,6 +18,8 @@ use yii\base\BootstrapInterface;
 use yii\base\Controller as YiiBaseController;
 //use yii\helpers\ArrayHelper;
 
+use Exception;
+
 /**
  * United module. Base part.
  *
@@ -125,7 +127,7 @@ class UniBaseModule extends BaseModule
             } else {
                 $msg = "Problem: found many loaded children of module '{$class}' - can't select proper";
                 Yii::error($msg);
-                //throw new \Exception($msg);
+                //throw new Exception($msg);
                 //?? todo
                 //!! need to allow many children of one ancestor
             }
@@ -260,7 +262,7 @@ class UniBaseModule extends BaseModule
                     if (empty($result)) {//echo "save {$class}<br>";
                         $result = $class;
                     } else {
-                        throw new \Exception("Find duplicate namespace '{$moduleNamespace}' for modules '{$result}' and '{$class}'");//!! for debug
+                        throw new Exception("Find duplicate namespace '{$moduleNamespace}' for modules '{$result}' and '{$class}'");//!! for debug
                         //return false;
                     }
                 }
@@ -392,7 +394,7 @@ class UniBaseModule extends BaseModule
             if (!empty($result)) {
                 return $result;
             } else {
-                throw new \Exception("Module with uniqueId '{$uid}' was not registered in application");
+                throw new Exception("Module with uniqueId '{$uid}' was not registered in application");
             }
         }
 /**/
@@ -400,7 +402,7 @@ class UniBaseModule extends BaseModule
         $message = __METHOD__."($moduleClassName): Can't get module by classname '{$moduleClassName}'.";
         if (!$loadAnonimous) {
             Yii::trace($message);
-            //throw new \Exception($message);
+            //throw new Exception($message);
             return null;
         } else {
             $message .= ' Create anonimous module.';//echo $message;exit;
@@ -587,7 +589,7 @@ var_dump($moduleContainer);exit;
     public function getModelClassname($alias)
     {
         if (empty($this->_models[$alias])) {
-            throw new \Exception("Shared model '{$alias}' not found in configuration of module " . static::className());
+            throw new Exception("Shared model '{$alias}' not found in configuration of module " . static::className());
         }
         return $this->_models[$alias];
     }
@@ -628,7 +630,7 @@ var_dump($moduleContainer);exit;
         }//echo static::ClassName();var_dump($this->_models);var_dump($this->params);exit;
 
         //return false; // or exception is better
-        throw new \Exception("Shared model '{$alias}' not found in configuration of module " . static::className());
+        throw new Exception("Shared model '{$alias}' not found in configuration of module " . static::className());
     }
 
     /**
@@ -709,7 +711,7 @@ var_dump($moduleContainer);exit;
     public function getAssetClassname($alias)
     {
         if (empty($this->_assets[$alias])) {
-            throw new \Exception("Asset '{$alias}' not found in configuration of module " . static::className());
+            throw new Exception("Asset '{$alias}' not found in configuration of module " . static::className());
         }
         return $this->_assets[$alias];
     }
@@ -727,4 +729,53 @@ var_dump($moduleContainer);exit;
             return $class::register($view);
         }
     }
+
+    /** Shared widgets array in format alias => string|array|callable object definition */
+    protected $_widgets;
+    /** Save widgets classnames with aliases geting from config */
+    protected function setWidgets($config)
+    {
+        foreach ($config as $alias => $className) {
+            $this->_widgets[$alias] = $className;
+        }
+    }
+    /**
+     * Get widget by it's alias defined in module's config.
+     * @param string $alias
+     * @param array $params the constructor parameters
+     * @return Object widget
+     * @throws Exception if the alias not found.
+     */
+    public function getWidget($alias, array $params = [])
+    {
+        if (empty($this->_widgets[$alias])) {
+            throw new Exception("Shared widget '{$alias}' not found in configuration of module " . static::className());
+        }
+        $widget = Yii::createObject($this->_widgets[$alias], $params);
+        return $widget;
+    }
+    /**
+     * Get widget class by alias defined in module config.
+     * @param string $alias
+     * @return string|false widget class name of false if not found
+     * @throws Exception if widget config has illegal format.
+     */
+    public static function widgetClass($alias)
+    {
+        $result = false;
+        $module = static::instance();
+        if (!empty($module) && !empty($module->_widgets[$alias])) {
+            $config = $module->_widgets[$alias];
+            if (is_string($config)) {
+                $result = $config;
+            } elseif (!empty($config['class'])) {
+                $result = $config['class'];
+            } else {
+                throw new Exception("Shared widget '{$alias}' has wrong in configuration in module " . static::className());
+            }
+        }
+        return $result;
+    }
+
+
 }
