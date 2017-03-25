@@ -230,4 +230,76 @@ class BaseDataModel extends ActiveRecord
         return $sort;
     }
 
+    /**
+     * Search ID for record placed near record with $id for order by $orderField in $direction.
+     * @param integer $id initial record id
+     * @param string $direction is 'up' or 'down'
+     * @param array $where additional query condition, for example ['parent_id' => NNN]
+     * @param string $orderField means ordering only by this field
+     * @return integer|false looked for record id
+     */
+    public function getNearId($id, $direction, $where = [], $orderField = 'prio')
+    {//echo __METHOD__."($id,$direction)<br>";var_dump($where);
+        if (!in_array($direction, ['up', 'down'])) return false;
+
+        $item = self::findOne(['id' => $id]);
+        if (!empty($item->prio)) {
+            $prio = $item->prio;
+        } else {
+            return false;
+        }
+        if ($direction == 'down') {
+            $andWhere = ['>', $orderField, $prio];
+            $orderBy = [$orderField => SORT_ASC];
+        } else {
+            $andWhere = ['<', $orderField, $prio];
+            $orderBy = [$orderField => SORT_DESC];
+        }
+        $swapItem = self::find()
+            ->where($where)
+            ->andWhere($andWhere)
+            ->orderBy($orderBy)
+            ->limit(1)
+            ->one();
+        $swapId = !empty($swapItem->id) ? $swapItem->id : false;//var_dump($swapId);exit;
+        return $swapId;
+    }
+
+    /**
+     * Swap order field values for 
+     * @param integer $id1
+     * @param integer $id2
+     * @param string $orderField
+     * @return boolean
+     */
+    public function swapPrio($id1, $id2, $orderField = 'prio')
+    {//echo __METHOD__."($id1,$id2)<br>";
+        $item1 = self::findOne(['id' => $id1]);
+        if (!empty($item1->$orderField)) {
+            $prio1 = $item1->$orderField;
+        } else {
+            return false;
+        }
+        $item2 = self::findOne(['id' => $id2]);
+        if (!empty($item2->$orderField)) {
+            $prio2 = $item2->$orderField;
+        } else {
+            return false;
+        }//echo "$id1.$orderField=$prio1,$id2.$orderField=$prio2<br>";//exit;
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $item1->$orderField = $prio2;
+            $n1 = $item1->updateInternal();
+            $item2->$orderField = $prio1;
+            $n2 = $item2->updateInternal();
+            if ($n1 && $n2) $transaction->commit();
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            Yii::error($e);
+            if (YII_DEBUG) throw $e;
+        }
+        return true;
+    }
+
 }
