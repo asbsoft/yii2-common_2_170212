@@ -106,7 +106,7 @@ class UrlManagerMultilang extends YiiWebUrlManager
                     }
                     $url = $baseUrl . $link;
                     $request->setUrl($url);
-                    $msg = "corrected request->urr from '{$url0}' to '{$url}'";//echo"$msg<br>";
+                    $msg = "correct request->url from '{$url0}' to '{$url}'";//echo"$msg<br>";
                     Yii::trace($msg);
                 }
             }

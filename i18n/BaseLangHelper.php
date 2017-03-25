@@ -61,19 +61,27 @@ class BaseLangHelper extends Object
     /**
      * Convert 2/3-symbols language code or name into 5-symbols form
      * @param string $langCode 2/3-symbols language code
-     * @return string 5-symbols language code or original $langCode if not found
+     * @param boolean $strict
+     * @return string|false 5-symbols language code or if not found original $langCode or false if $strict
      */
-    public static function normalizeLangCode($langCode)
-    {
-        $langList = static::activeLanguagesArray();//var_dump($langList);exit;
-        foreach ($langList as $lang) {
-            if ($lang['code2'] == $langCode) return $lang['code_full'];
-            if ($lang['code3'] == $langCode) return $lang['code_full'];
-            if ($lang['code_full'] == $langCode) return $lang['code_full'];
-            if (strtolower($lang['name_en']) == strtolower($langCode)) return $lang['code_full'];
-            if (strtolower($lang['name_orig']) == strtolower($langCode)) return $lang['code_full'];
+    public static function normalizeLangCode($langCode, $strict = false)
+    {//echo __METHOD__."($langCode)<br>";
+        $langList = static::activeLanguagesArray();//var_dump($langList);
+        if ($strict) {
+            $result = false;
+        } else {
+            $result = $langCode;
         }
-        return $langCode; //?? or return false
+        foreach ($langList as $lang) {
+            if ($lang['code_full'] == $langCode || $lang['code2'] == $langCode || $lang['code3'] == $langCode) {
+                $result = $lang['code_full'];
+            } elseif (strtolower($lang['name_en']) == strtolower($langCode)) {
+                $result = $lang['code_full'];
+            } elseif (strtolower($lang['name_orig']) == strtolower($langCode)) {
+                $result = $lang['code_full'];
+            }
+        }//var_dump($result);//exit;
+        return $result;
     }
 
     /**
@@ -96,7 +104,7 @@ class BaseLangHelper extends Object
     /**
      * Find language by 2-symbols language code
      * @param string 2-symbols language code
-     * @return Lang object
+     * @return Lang|false object
      */
     public static function findLanguageByCode2($langCode2)
     {
@@ -104,6 +112,7 @@ class BaseLangHelper extends Object
         foreach ($langList as $lang) {
             if ($lang['code2'] == $langCode2) return $lang;
         }
+        return false;
     }
 
 }
