@@ -17,6 +17,7 @@ class UrlManagerMultilang extends YiiWebUrlManager
         parent::init();
 
         $this->enablePrettyUrl = true;
+        //$this->enableStrictParsing = true;
         $this->showScriptName = false;
     }
 

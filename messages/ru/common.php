@@ -12,6 +12,14 @@ return [
 
 // \validators\EitherValidator.php
     'Fill «{labels}».'          => 'Заполните «{labels}».',
-    '» or «'                    => '» или «'
+    '» or «'                    => '» или «',
+
+// web\BaseWebFile.php 
+    "File '{file}' is not from upload mirror area"
+                                => "Файл '{file}' не есть отражением загруженного",
+    "Source file '{file}' not found"
+                                => "Исходный файл '{file}' не найден",
+    "File has not allowed type '{ext}'"
+                                => "Файл имеет недопустимий тип '{ext}'",
 
 ];

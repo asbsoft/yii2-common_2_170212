@@ -31,6 +31,8 @@ class BaseWebFile extends Object
     /** Use true to disable image files processing before copying */
     public $uploadsDirectCopy = false;
 
+    public $fileUrl;
+
     /** Error message */
     public $errmsg = '';
     /** Messages translation category */
@@ -56,6 +58,8 @@ class BaseWebFile extends Object
     {//echo __METHOD__."($fileUrl)<br>";
         parent::__construct($config);
 
+        $this->fileUrl = $fileUrl;
+
         $this->uploadsRootPath = Yii::getAlias($this->uploadsRootPath);
         $this->webfileRootPath = Yii::getAlias($this->webfileRootPath);
         $this->webfileRootUrl  = Yii::getAlias($this->webfileRootUrl);
@@ -68,7 +72,8 @@ class BaseWebFile extends Object
             $this->_srcFilePath  = $this->uploadsRootPath . '/' . $this->_fileSubpath;//echo'src:';var_dump($this->_srcFilePath);
             $this->_destFilePath = $this->webfileRootPath . '/' . $this->_fileSubpath;//echo'dest:';var_dump($destFilePath);
         } else {
-            $this->errmsg = Yii::t($this->tc, "File '{file}' is not from upload mirror area", ['file' => $this->_destFilePath]);
+            $this->errmsg = __METHOD__ . ": "
+                . Yii::t($this->tc, "File '{file}' is not from upload mirror area", ['file' => $this->fileUrl]);
             $this->_fileSubpath = false;
         }//echo __METHOD__;var_dump($this->_fileSubpath);
     }
@@ -98,7 +103,9 @@ class BaseWebFile extends Object
     public function synchronize()
     {//echo __METHOD__;
         if (empty($this->_fileSubpath)) {
-            $this->errmsg = Yii::t($this->tc, "File '{file}' is not from upload mirror area", ['file' => $this->_destFilePath]);
+            $file = empty($this->_destFilePath) ? $this->fileUrl : $this->_destFilePath;
+            $this->errmsg = __METHOD__ . "({$this->fileUrl}): "
+                . Yii::t($this->tc, "File '{file}' is not from upload mirror area", ['file' => $file]);
             return false;
         }
 
@@ -187,7 +194,6 @@ class BaseWebFile extends Object
            return false;
         }
 
-//var_dump($fileBody);exit;
         $result = @file_put_contents($destFilePath, $fileBody, LOCK_EX);
         return $result;
     }
