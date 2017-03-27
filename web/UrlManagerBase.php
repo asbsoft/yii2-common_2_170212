@@ -5,58 +5,20 @@ namespace asb\yii2\common_2_170212\web;
 use asb\yii2\common_2_170212\i18n\LangHelper;
 
 use Yii;
-            
-/**
- * @author ASB <ab2014box@gmail.com>
- */
-class UrlManagerMultilang extends UrlManagerBase
+use yii\web\UrlManager as YiiUrlManager;
+
+class UrlManagerBase extends YiiUrlManager
 {
-    public function init()
-    {//echo __METHOD__;var_dump($this->rules);exit;
-        parent::init();
-
-        $this->enablePrettyUrl = true;
-        //$this->enableStrictParsing = true;
-        $this->showScriptName = false;
-    }
-
-    /** 
-     * @inheritdoc
-     * Additional add language info in returned relative URL
+    /**
+     * Process language in request.
+     * At first find it in _GET parameter lang=XX if exists.
+     * Second find language in URL-prefix /LL/path/info/.
+     * If found - save language in session/cookie and cut language from URL and pathInfo.
+     * @param yii\web\Request $request
      */
-    public function createUrl($params)
-    {//echo __METHOD__;var_dump($params);
-        $url0 = parent::createUrl($params);//var_dump($url0);
+    public static function processLanguage($request)
+    {//echo __METHOD__;
 
-        if (LangHelper::countActiveLanguages() > 1)
-        {
-            $lang_code2 = LangHelper::getLangCode2(
-                isset($params['lang'])
-                    ? $params['lang']
-                  //: Yii::$app->language
-                    : LangHelper::defaultLanguage()
-            );//var_dump($lang_code2);
-
-            $baseUrl = $this->showScriptName || !$this->enablePrettyUrl ? $this->getScriptUrl() : $this->getBaseUrl();
-
-            if ($baseUrl !== '' && strpos($url0, $baseUrl) === 0) $url0 = substr($url0, strlen($baseUrl));
-
-            $url = "{$baseUrl}/{$lang_code2}{$url0}";
-        } else {
-            $url = $url0;
-        }//var_dump($url);
-        
-        return $url;
-    }
-
-    /** 
-     * @inheritdoc
-     */
-    public function parseRequest($request)
-    {//var_dump($request);
-        static::processLanguage($request);
-
-/* move to UrlManagerBase:
         if (LangHelper::countActiveLanguages() > 1)
         {
             //$lang = LangHelper::getFirstActiveLanguageCode(); //!! no
@@ -64,7 +26,6 @@ class UrlManagerMultilang extends UrlManagerBase
 
             // Get language from _GET parameter lang=XX if exists.
             // This language has low priority than as URL part: BASE_URL/XX/...
-            //$get = Yii::$app->request->get();
             $get = $request->get();
             if (!empty($get['lang'])) {
                 $getLang = $get['lang'];
@@ -97,10 +58,10 @@ class UrlManagerMultilang extends UrlManagerBase
             LangHelper::saveLanguageInSession($lang);
 
             // Correct $request->url by cutting language part if exists
-            $baseUrl = $this->showScriptName || !$this->enablePrettyUrl ? $this->getScriptUrl() : $this->getBaseUrl();//echo "baseUrl=$baseUrl<br>";
-            $url0 = $request->getUrl(); // $request->url begin with '/'
-            //echo "orig url:'$url0'<br>";
-            if ($baseUrl !== '' && strpos($url0, $baseUrl) === 0) {
+            $urlManager = Yii::$app->urlManager;
+            $baseUrl = $urlManager->showScriptName || !$urlManager->enablePrettyUrl ? $urlManager->getScriptUrl() : $urlManager->getBaseUrl();//echo "baseUrl=$baseUrl<br>";
+            $url0 = $request->getUrl();//echo "orig url:'$url0'<br>";
+            if ($baseUrl !== '' && strpos($url0, $baseUrl) === 0) { // $url0 = $request->url begin with '/'
                 $link = substr($url0, strlen($baseUrl));
                 if (isset($langPart) && LangHelper::isValidLangCode($langPart)) {
                     $langPart = '/' . $langPart;
@@ -114,9 +75,7 @@ class UrlManagerMultilang extends UrlManagerBase
                 }
             }
         }    
-*/
-        $route = parent::parseRequest($request);//var_dump($route);exit;
-        return $route;
+
     }
 
 }

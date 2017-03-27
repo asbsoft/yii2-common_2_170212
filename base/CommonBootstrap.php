@@ -5,6 +5,7 @@ namespace asb\yii2\common_2_170212\base;
 use asb\yii2\common_2_170212\base\UniApplication;
 use asb\yii2\common_2_170212\controllers\BaseAdminController;
 use asb\yii2\common_2_170212\i18n\LangHelper;
+use asb\yii2\common_2_170212\web\UrlManagerBase;
 
 use Yii;
 use yii\base\BootstrapInterface;
@@ -44,6 +45,9 @@ class CommonBootstrap implements BootstrapInterface
         if (!is_dir($dir)) @FileHelper::createDirectory($dir);
         $dir = Yii::getAlias('@webfilespath');
         if (!is_dir($dir)) @FileHelper::createDirectory($dir);
+
+        $request = $app->getRequest();
+        UrlManagerBase::processLanguage($request);
 
         //LangHelper::appendDefLangToHomeUrl($app);
 

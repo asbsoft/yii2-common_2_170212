@@ -5,7 +5,7 @@ namespace asb\yii2\common_2_170212\web;
 use asb\yii2\common_2_170212\base\UniModule;
 
 use Yii;
-use yii\web\UrlManager as YiiUrlManager;
+//use yii\web\UrlManager as YiiUrlManager;
 
 /**
  * Composite URL manager.
@@ -14,7 +14,7 @@ use yii\web\UrlManager as YiiUrlManager;
  *
  * @author ASB <ab2014box@gmail.com>
  */
-class UrlManagerInModule extends YiiUrlManager
+class UrlManagerInModule extends UrlManagerBase
 {
     public $sitetreeModuleUniqueId = 'sys/sitetree';
 
