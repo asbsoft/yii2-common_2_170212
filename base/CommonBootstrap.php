@@ -46,12 +46,11 @@ class CommonBootstrap implements BootstrapInterface
         $dir = Yii::getAlias('@webfilespath');
         if (!is_dir($dir)) @FileHelper::createDirectory($dir);
 
-        $request = $app->getRequest();
-        UrlManagerBase::processLanguage($request);
-
         //LangHelper::appendDefLangToHomeUrl($app);
 
         $app->language = LangHelper::defaultLanguage($app);//var_dump($app->language);
+
+        UrlManagerBase::processLanguage($app->getRequest());
 
         LangHelper::saveCurrentLanguageInCookies($app);
 

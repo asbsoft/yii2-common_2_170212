@@ -53,68 +53,9 @@ class UrlManagerMultilang extends UrlManagerBase
      * @inheritdoc
      */
     public function parseRequest($request)
-    {//var_dump($request);
-        static::processLanguage($request);
+    {//echo __METHOD__;var_dump($request->url);
+        //static::processLanguage($request); // already call in UrlManagerBase
 
-/* move to UrlManagerBase:
-        if (LangHelper::countActiveLanguages() > 1)
-        {
-            //$lang = LangHelper::getFirstActiveLanguageCode(); //!! no
-            $lang = Yii::$app->language; // current language
-
-            // Get language from _GET parameter lang=XX if exists.
-            // This language has low priority than as URL part: BASE_URL/XX/...
-            //$get = Yii::$app->request->get();
-            $get = $request->get();
-            if (!empty($get['lang'])) {
-                $getLang = $get['lang'];
-                if (LangHelper::isValidLangCode($getLang)) {
-                    $lang = $getLang;
-                }
-            }           
-
-            // Get language from URL if exists
-            // and correct $request->pathInfo by cutting language part
-            $pathInfo0 = $request->getPathInfo(); // pathInfo has not leading '/'
-            //echo "orig pathInfo:'$pathInfo'<br>";
-            $parts = explode('/', $pathInfo0, 2);//var_dump($parts);
-            if (!empty($parts[0])) {
-                $langPart = $parts[0];//var_dump($langPart);
-                if (LangHelper::isValidLangCode($langPart)) {
-                    $pathInfo = substr($pathInfo0, strlen($langPart) + 1);
-                    $lang = $langPart;
-                    $request->setPathInfo($pathInfo);
-
-                    $msg = "corrected pathInfo from '{$pathInfo0}' to '{$pathInfo}'<br>";//echo"$msg<br>";
-                    Yii::trace($msg);
-                }
-            }
-
-            // Save language
-            $lang = LangHelper::normalizeLangCode($lang);//echo "new lang:'$lang'<br>";
-            Yii::$app->language = $lang;
-            LangHelper::setDefaultLanguage($lang);
-            LangHelper::saveLanguageInSession($lang);
-
-            // Correct $request->url by cutting language part if exists
-            $baseUrl = $this->showScriptName || !$this->enablePrettyUrl ? $this->getScriptUrl() : $this->getBaseUrl();//echo "baseUrl=$baseUrl<br>";
-            $url0 = $request->getUrl(); // $request->url begin with '/'
-            //echo "orig url:'$url0'<br>";
-            if ($baseUrl !== '' && strpos($url0, $baseUrl) === 0) {
-                $link = substr($url0, strlen($baseUrl));
-                if (isset($langPart) && LangHelper::isValidLangCode($langPart)) {
-                    $langPart = '/' . $langPart;
-                    if (strpos($link, $langPart) === 0) {
-                        $link = substr($link, strlen($langPart));
-                    }
-                    $url = $baseUrl . $link;
-                    $request->setUrl($url);
-                    $msg = "correct request->url from '{$url0}' to '{$url}'";//echo"$msg<br>";
-                    Yii::trace($msg);
-                }
-            }
-        }    
-*/
         $route = parent::parseRequest($request);//var_dump($route);exit;
         return $route;
     }
