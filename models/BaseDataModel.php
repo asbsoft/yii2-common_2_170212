@@ -8,6 +8,8 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\Inflector;
 
+use ReflectionClass;
+
 /**
  * Base data model.
  *
@@ -44,7 +46,7 @@ class BaseDataModel extends ActiveRecord
         parent::init();
 
         if (empty($this->module)) {
-            $rc = new \ReflectionClass($this);
+            $rc = new ReflectionClass($this);
             $modelNamespace = $rc->getNamespaceName();//var_dump($modelNamespace);
             $moduleNamespace = substr($modelNamespace, 0, strrpos($modelNamespace, '\\'));
             $moduleClassName = $moduleNamespace . '\Module';//var_dump($moduleClassName);exit;
@@ -88,6 +90,7 @@ class BaseDataModel extends ActiveRecord
         }
     }
 
+    protected static $_tableName = [];
     /**
      * @inheritdoc
      * You can use class constant TABLE_NAME
@@ -96,12 +99,30 @@ class BaseDataModel extends ActiveRecord
      */
     public static function tableName()
     {
-        $class = get_called_class();
-        if (@constant("{$class}::TABLE_NAME")) {
-            return '{{%' . static::TABLE_NAME . '}}';
-        } else {
-            return parent::tableName();
+        $class = get_called_class();//echo __METHOD__."@{$class}<br>";
+        if (empty(static::$_tableName[$class])) {
+            $moduleClass = static::moduleClass();
+            $module = UniModule::getModuleByClassName($moduleClass);
+            if (!empty($module)) {
+                $params = $module->params;//echo $class.'::'.__FUNCTION__."()@module:{$module->uniqueId}";var_dump($params);
+                $rc = new ReflectionClass($class);
+                do {
+                    $nextClass = $rc->getName();//var_dump($nextClass);
+                    if (!empty($params[$nextClass]['tableName'])) {//echo"FOUND for $class: params[$nextClass]['tableName']={$params[$nextClass]['tableName']}<br>";
+                        static::$_tableName[$class] = $params[$nextClass]['tableName']; // dont add '{{%}}' here - it may be alian table
+                        break;
+                    }
+                    $rc = $rc->getParentClass();
+                } while (!empty($rc));
+            }
+            if (empty(static::$_tableName[$class]) && @constant("{$class}::TABLE_NAME")) { // deprecated constant, leave for reverse compatibility
+                static::$_tableName[$class] = '{{%' . static::TABLE_NAME . '}}';
+            }
+            if (empty(static::$_tableName[$class])) {
+                static::$_tableName[$class] = parent::tableName();
+            }
         }
+        return static::$_tableName[$class];
     }
 
     /**
