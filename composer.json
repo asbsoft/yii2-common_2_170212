@@ -17,10 +17,10 @@
         "yiisoft/yii2-jui": "*",
         "yiisoft/yii2-imagine": "2.*",
 
-        "lafeber/world-flags-sprite": "*",
-
         "mihaildev/yii2-ckeditor": "*",
         "mihaildev/yii2-elfinder": "*",
+
+        "lafeber/world-flags-sprite": "*"
     },
     "autoload": {
         "psr-4": {
