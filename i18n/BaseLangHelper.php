@@ -17,7 +17,7 @@ class BaseLangHelper extends Object
      */
     public static function activeLanguagesArray()
     {
-        $langList = include dirname(__DIR__) . '/config/languages.php';
+        $langList = include(dirname(__DIR__) . '/config/langs-default.php');
         return $langList;
     }
     

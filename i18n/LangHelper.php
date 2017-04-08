@@ -10,6 +10,8 @@ use yii\helpers\ArrayHelper;
 use yii\web\Cookie;
 use yii\web\Response;
 
+define('LANGS_CONFIG_FNAME', dirname(__DIR__) . '/config/langs-default.php');
+
 /**
  * Lang helper.
  *
@@ -27,8 +29,9 @@ class LangHelper extends BaseLangHelper
         'langModuleUniqueId' => 'sys/lang',
 
         /** Application can get languages from this file */
-      //'langsConfigFname'   =>  dirname(__DIR__) . '/config/langs-default.php', // error
-        'langsConfigFname'   => '@asb/yii2/common_2_170212/config/langs-default.php',
+        'langsConfigFname' => LANGS_CONFIG_FNAME,
+      //'langsConfigFname' => '@asb/yii2/common_2_170212/config/langs-default.php', // OK but alias can change
+      //'langsConfigFname' => dirname(__DIR__) . '/config/langs-default.php', // syntax error in PHP 5.4
 
         // Language session and cookie parameters
         'appTypePrefix'          => 'basic',
