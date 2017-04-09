@@ -130,13 +130,11 @@ class BaseRoutesBuilder extends Component
     public static function properRule($rule, $link)
     {
         if (isset($rule->pattern)) {
-            $pattern = substr($rule->pattern, 2, -3);//var_dump($pattern);
-            if ($pattern == $link) return true;
+            if (preg_match($rule->pattern, $link) > 0) return true;
         }
         if ($rule instanceof GroupUrlRule) {
             foreach ($rule->rules as $nextRule) {
-                $pattern = substr($nextRule->pattern, 2, -3);//var_dump($pattern);
-                if ($pattern == $link) return true;
+                if (preg_match($nextRule->pattern, $link) > 0) return true;
             }
         }
         return false;
