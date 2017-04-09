@@ -8,6 +8,7 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\Inflector;
 
+use Exception;
 use ReflectionClass;
 
 /**
@@ -65,7 +66,7 @@ class BaseDataModel extends ActiveRecord
         }//var_dump($this->module);exit;
 
         if (empty($this->module)) {
-            throw new \Exception("Model {$this::className()} must have 'module' attribute");
+            throw new Exception("Model {$this::className()} must have 'module' attribute");
         }
 
         $this->prepare();

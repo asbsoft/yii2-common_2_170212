@@ -9,6 +9,8 @@ use yii\base\Module as YiiBaseModule;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 
+use ReflectionClass;
+
 /**
  * Module configs builder.
  * Build initial module configs by getting them from module's config file and all it parents configs.
@@ -83,7 +85,7 @@ class BaseConfigsBuilder extends Component
         $app = Yii::$app;
 
         $config = [];
-        $class = new \ReflectionClass($module);
+        $class = new ReflectionClass($module);
         while (true) {
             $modulePath = dirname($class->getFileName());//var_dump($modulePath);
             $configFile = $modulePath . DIRECTORY_SEPARATOR . $subdir . DIRECTORY_SEPARATOR . $name . '.php';//

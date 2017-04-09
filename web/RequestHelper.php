@@ -4,6 +4,8 @@ namespace asb\yii2\common_2_170212\web;
 
 use yii\base\InvalidConfigException;
 
+use Exception;
+
 /**
  * Some usefule methods copied from yii\web\Request.
  */
@@ -34,7 +36,7 @@ class RequestHelper
                 $requestUri .= '?' . $_SERVER['QUERY_STRING'];
             }
         } else {
-            throw new \Exception('Unable to determine the request URI.');
+            throw new Exception('Unable to determine the request URI.');
         }
 
         return $requestUri;

@@ -14,6 +14,9 @@ use yii\web\GroupUrlRule;
 use yii\rest\UrlRule as RestUrlRule;
 use yii\helpers\Url;
 
+use Exception;
+use ReflectionClass;
+
 /**
  * Common base module.
  *
@@ -110,7 +113,7 @@ class BaseModule extends Module
             $this->_pathList = [];
             $this->_namespaceList = [];
 
-            $class = new \ReflectionClass($this);
+            $class = new ReflectionClass($this);
             $dirname = dirname($class->getFileName());
                 
             $this->_pathList[] = $dirname;
@@ -174,7 +177,7 @@ class BaseModule extends Module
 
                     $this->setStartLink($routeConfig);
                 } else {
-                    throw new \Exception("Routes list file '{$file}' not found!");
+                    throw new Exception("Routes list file '{$file}' not found!");
                 }
             }
         }//echo RoutesInfo::showRoutes($this->uniqueId);exit;
@@ -202,7 +205,7 @@ class BaseModule extends Module
             }
         }
         if ($module instanceof self) {//exit;
-            throw new \Exception("Routes list file '{$baseFileName}' not found in config(s) folder(s) for module " . $module->className());
+            throw new Exception("Routes list file '{$baseFileName}' not found in config(s) folder(s) for module " . $module->className());
         } else {
             return false;
         }
@@ -269,7 +272,7 @@ class BaseModule extends Module
                 //$route = ??;
                 $url = Url::toRoute($link);
             } else {
-                throw new \Exception("Insufficient 'link' or 'action' in 'startLink' paremeter of routeConfig");
+                throw new Exception("Insufficient 'link' or 'action' in 'startLink' paremeter of routeConfig");
             }
             
             $tc = TranslationsBuilder::getBaseTransCategory($this) . '/module';//var_dump($tc);

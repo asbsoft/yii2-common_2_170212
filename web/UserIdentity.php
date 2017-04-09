@@ -12,6 +12,8 @@ use yii\web\IdentityInterface;
 //use yii\db\ActiveRecordInterface;
 use yii\helpers\ArrayHelper;
 
+use Exception;
+
 /**
  * Class providing identity information.
  * If exists module with static::userModuleUniqueId load User Identity there.
@@ -194,7 +196,7 @@ class UserIdentity extends Model implements IdentityInterface //, ActiveRecordIn
             } else if (method_exists($userIdentiry, 'usersList')) {
                 self::$_usersList = $userIdentiry->usersList();
             } else {
-                throw new \Exception("Method 'usersList' expected in UserIdentity");
+                throw new Exception("Method 'usersList' expected in UserIdentity");
             }
         }//var_dump(self::$_usersList);exit;
         return self::$_usersList;

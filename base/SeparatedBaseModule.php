@@ -10,6 +10,8 @@ use Yii;
 use yii\base\BootstrapInterface;
 use yii\helpers\ArrayHelper;
 
+use Exception;
+
 /**
  * Package module class.
  * Package contain backend and frontend in common folder at same level:
@@ -41,7 +43,7 @@ class SeparatedBaseModule extends BaseModule implements BootstrapInterface
         parent::init();
 
         if (empty($this->_type)) {
-            throw new \Exception("You must set type of module in constructor");
+            throw new Exception("You must set type of module in constructor");
         }
     }
 

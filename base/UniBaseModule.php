@@ -19,6 +19,7 @@ use yii\base\Controller as YiiBaseController;
 //use yii\helpers\ArrayHelper;
 
 use Exception;
+use ReflectionClass;
 
 /**
  * United module. Base part.
@@ -281,7 +282,7 @@ class UniBaseModule extends BaseModule
         if (!isset($this->_pathList)) {
             $this->_pathList = [];
             $this->_namespaceList = [];
-            $class = new \ReflectionClass($this);//var_dump($class);
+            $class = new ReflectionClass($this);//var_dump($class);
             while (true) {
                 $dirname = dirname($class->getFileName());
                 if ($dirname === __DIR__) break; // don't use this class
@@ -310,7 +311,7 @@ class UniBaseModule extends BaseModule
      */
     public function getBaseNamespace()
     {
-        $class = new \ReflectionClass($this);
+        $class = new ReflectionClass($this);
         return $class->getNamespaceName();
     }
 
@@ -320,7 +321,7 @@ class UniBaseModule extends BaseModule
      */
     public function getModuleClassname()
     {
-        $class = new \ReflectionClass($this);
+        $class = new ReflectionClass($this);
         return $class->getNamespaceName() . '\Module';
     }
 
@@ -489,7 +490,7 @@ var_dump($moduleContainer);exit;
         $modules = Yii::$app->loadedModules;//echo'loadedModules:';var_dump(array_keys($modules));
         foreach ($modules as $module) {
             if ($module instanceof UniModule) {
-                $class = new \ReflectionClass($module);
+                $class = new ReflectionClass($module);
                 $classPath = dirname($class->getFileName());//var_dump($classPath);
                 if ($modulePath == $classPath) return $module;
             }
