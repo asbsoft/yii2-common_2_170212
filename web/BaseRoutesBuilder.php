@@ -11,6 +11,9 @@ use yii\web\GroupUrlRule;
 use yii\rest\UrlRule as RestUrlRule;
 use yii\web\UrlRule as WebUrlRule;
 
+use Exception;
+use ReflectionClass;
+
 /**
  * Module routes builder
  *
@@ -105,7 +108,7 @@ class BaseRoutesBuilder extends Component
      */
     public static function getRoutesFilename($module, $type)
     {//echo __METHOD__."({$module->className()}, $type)<br>";
-        $class = new \ReflectionClass($module);
+        $class = new ReflectionClass($module);
         $dirname = dirname($class->getFileName());
         $baseFileName = sprintf(BaseModule::$patternRoutesFilename, $type);
         $routesSubdir = $dirname . DIRECTORY_SEPARATOR . static::$configsSubdir;
@@ -114,10 +117,29 @@ class BaseRoutesBuilder extends Component
             return $file;
         }
         if ($module instanceof self) {//exit;
-            throw new \Exception("Routes list file '{$baseFileName}' not found in config(s) folder(s) for module " . $module->className());
+            throw new Exception("Routes list file '{$baseFileName}' not found in config(s) folder(s) for module " . $module->className());
         } else {
             return false;
         }
+    }
+
+    /**
+     * Check if link will recognize by route's rule.
+     * @return boolean true if found $rule correspond to $link
+     */
+    public static function properRule($rule, $link)
+    {
+        if (isset($rule->pattern)) {
+            $pattern = substr($rule->pattern, 2, -3);//var_dump($pattern);
+            if ($pattern == $link) return true;
+        }
+        if ($rule instanceof GroupUrlRule) {
+            foreach ($rule->rules as $nextRule) {
+                $pattern = substr($nextRule->pattern, 2, -3);//var_dump($pattern);
+                if ($pattern == $link) return true;
+            }
+        }
+        return false;
     }
 
 }
