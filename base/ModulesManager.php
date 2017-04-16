@@ -46,9 +46,7 @@ class ModulesManager implements ModulesManagerInterface
     public static function instance()
     {//echo __METHOD__.'<br>';
         if (empty(static::$_modmgr)) {
-//$m = array_keys(Yii::$app->loadedModules);
-//xdebug_break();
-            $module = Yii::$app->getModule(static::$modulesManagerModuleUid); //?? infinite loop
+            $module = Yii::$app->getModule(static::$modulesManagerModuleUid);
             //$module = UniModule::getModuleByUniqueId(static::$modulesManagerModuleUid); //?? infinite loop
             //$module = false; //!! for debug
             //var_dump($module);exit;

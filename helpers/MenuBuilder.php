@@ -25,15 +25,15 @@ class MenuBuilder
         $submodules = ArrayHelper::merge($module->modules, ModulesManager::submodules($module));//echo"@{$module->uniqueId}={$module::className()}";var_dump(array_keys($submodules));
         
         $itemsModules = [];
-        foreach ($submodules as $submoduleId => $submodule)
-        {
+        foreach ($submodules as $submoduleId => $submodule) {
             if (is_array($submodule)) $submodule = $module->getModule($submoduleId);
             if (empty($submodule)) continue;
 
             $nextItem = false;
             $startLinkInfo = BaseModule::startLink($submodule->uniqueId, $routesType);
             if (!empty($startLinkInfo)) {//var_dump($startLinkInfo);
-                $nextItem = ['label' => $startLinkInfo['label'],
+                $nextItem = [
+                    'label' => $startLinkInfo['label'],
                     'url' => isset($startLinkInfo['route']) ? $startLinkInfo['route'] : $startLinkInfo['link']
                 ];//echo"found item for '{$submodule->uniqueId}'";var_dump($nextItem);
             
@@ -49,9 +49,9 @@ class MenuBuilder
                 if (!empty($nextItem)) $itemsModules[] = $nextItem;
             } else {
                 if (empty($nextItem)) {
-                    //$tc = TranslationsBuilder::getBaseTransCategory($submodule) . '/module';//echo"for {$submodule->uniqueId}";var_dump($tc);
+                    //$tc = TranslationsBuilder::getBaseTransCategory($submodule) . '/module';//echo"for {$submodule->uniqueId} tc:";var_dump($tc);
                     $label = empty($submodule->params['label'])
-                           ? "Submenu for '{$submodule->uniqueId}'"
+                           ? Yii::t('common', "Submenu for '{uid}'", ['uid' => $submodule->uniqueId])
                            //: Yii::t($tc, $submodule->params['label']);
                            : $submodule->params['label']; // must be already translated
                 } else {

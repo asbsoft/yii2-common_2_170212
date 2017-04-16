@@ -48,7 +48,7 @@ class CommonBootstrap implements BootstrapInterface
 
         //LangHelper::appendDefLangToHomeUrl($app);
 
-        $app->language = LangHelper::defaultLanguage($app);//var_dump($app->language);
+        $app->language = LangHelper::defaultLanguage($app);//echo __METHOD__;var_dump($app->language);
 
         UrlManagerBase::processLanguage($app->getRequest());
 

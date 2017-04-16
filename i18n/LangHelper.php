@@ -25,8 +25,15 @@ class LangHelper extends BaseLangHelper
      * in Yii2-application config['params']['asb\yii2\common_2_170212\i18n\LangHelper'].
      */
     public static $defaultParams = [
-        /** Application can get languages from this module */
-        'langModuleUniqueId' => 'sys/lang',
+        /**
+         * Application can get languages from this module.
+         * This module must be first level module!!
+         * for example 'langModuleUniqueId' => 'sys/lang' made init translation problems,
+         * because this involve to bootstrap first module 'sys' with all it's submodules to get lang module.
+         * But lang module can call in base\CommonBootstrap to setup init language
+         * before any other modules bootstrap.
+         */
+        'langModuleUniqueId' => 'lang',
 
         /** Application can get languages from this file */
         'langsConfigFname' => LANGS_CONFIG_FNAME,

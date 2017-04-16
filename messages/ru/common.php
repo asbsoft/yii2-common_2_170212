@@ -10,7 +10,7 @@ return [
 // widgets\ckeditor\ElFinderController.php 
     'Uploads files folder'      => 'Каталог для загрузки файлов',
 
-// \validators\EitherValidator.php
+// validators\EitherValidator.php
     'Fill «{labels}».'          => 'Заполните «{labels}».',
     '» or «'                    => '» или «',
 
@@ -21,5 +21,8 @@ return [
                                 => "Исходный файл '{file}' не найден",
     "File has not allowed type '{ext}'"
                                 => "Файл имеет недопустимий тип '{ext}'",
+
+// helpers\MenuBuilder
+    "Submenu for '{uid}'"       => "Подменю для '{uid}'",
 
 ];

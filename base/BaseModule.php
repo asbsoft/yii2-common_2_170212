@@ -204,8 +204,9 @@ class BaseModule extends Module
                 return $file;
             }
         }
-        if ($module instanceof self) {//exit;
-            throw new Exception("Routes list file '{$baseFileName}' not found in config(s) folder(s) for module " . $module->className());
+        if ($module instanceof self) {
+            $msg = "Routes list file '{$baseFileName}' not found in configs folder(s) for module " . $module->className();//echo $msg;exit;
+            throw new Exception($msg);
         } else {
             return false;
         }
@@ -252,7 +253,6 @@ class BaseModule extends Module
      */
     protected function setStartLink($routeConfig)
     {//echo __METHOD__."@{$this->uniqueId}";var_dump($routeConfig);
-
         if (empty($routeConfig['startLink']) && !empty($routeConfig['startLinkLabel'])) {
             $routeConfig['startLink'] = [
                 'label' => $routeConfig['startLinkLabel'],
@@ -275,7 +275,7 @@ class BaseModule extends Module
                 throw new Exception("Insufficient 'link' or 'action' in 'startLink' paremeter of routeConfig");
             }
             
-            $tc = TranslationsBuilder::getBaseTransCategory($this) . '/module';//var_dump($tc);
+            $tc = TranslationsBuilder::getBaseTransCategory($this) . '/module';//var_dump($tc,Yii::$app->language);
             $linkData = [
                 'label' => Yii::t($tc, $routeConfig['startLink']['label']),
                 'link'  => $url,
@@ -323,6 +323,7 @@ class BaseModule extends Module
      */
     public function bootstrap($app)
     {//echo __METHOD__."@{$this::className()}({$this->uniqueId})<br>";//var_dump($this->bootstrap);var_dump(static::$_bootstrappedModules);
+
         if (empty(static::$_bootstrappedModules[$this->uniqueId])) {
             static::$_bootstrappedModules[$this->uniqueId] = true;
 
