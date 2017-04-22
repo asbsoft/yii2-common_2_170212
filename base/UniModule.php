@@ -3,6 +3,7 @@
 namespace asb\yii2\common_2_170212\base;
 
 use Yii;
+use yii\base\InvalidConfigException;
 
 /**
  * United module.
@@ -11,7 +12,7 @@ use Yii;
  */
 class UniModule extends UniBaseModule
 {
-    public static $tc = 'common';
+    public static $tc = 'common'; // default, can change in base\BaseModule::bootstrap()
 
     /** Get some module info
      *  @param string $cmd
@@ -26,7 +27,12 @@ class UniModule extends UniBaseModule
                 return $this->params['label'];
             } else {
                 //return false;
-                return Yii::t(static::$tc, 'Module') . ' ' . $this->uniqueId;
+                try {
+                    $ms = Yii::$app->i18n->getMessageSource(static::$tc);
+                } catch(InvalidConfigException $ex) {
+                    $ms = false;
+                }
+                return ($ms ? Yii::t(static::$tc, 'Module') : 'Module') . ' ' . $this->uniqueId;
             }
             break;
           case 'sitetree-params-action': // return action in route format

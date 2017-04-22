@@ -133,7 +133,9 @@ class ModulesManager implements ModulesManagerInterface
         if (method_exists ($modmgr, 'registeredModuleName')) {
             $label = $modmgr::registeredModuleName($module->uniqueId);
         }
-        if (empty($label) && $module instanceof UniModule) $label = $module->inform('label');
+        if (empty($label) && $module instanceof UniModule) {
+            $label = $module->inform('label');
+        }
         if (empty($label)) {
                 $label = Yii::t(self::$tc, 'Module') . ' ' . $module->uniqueId;
         }
