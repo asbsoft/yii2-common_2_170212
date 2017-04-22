@@ -96,9 +96,12 @@ class UniBaseModule extends BaseModule
         }
 
         // only after bootstrap:
-        $tc = TranslationsBuilder::getBaseTransCategory($this) . '/module';//echo"for {$this->uniqueId}";var_dump($tc);
+        $tcCat = TranslationsBuilder::getBaseTransCategory($this);
+        $tc = $tcCat . '/module';//echo"for {$this->uniqueId}";var_dump($tc);
         if (!empty($this->params['label'])) {//var_dump(Yii::$app->language);//?? sometimes == 'en-US'
-            $this->params['label'] = Yii::t($tc, $this->params['label']);//var_dump($this->params['label']);
+            if (!empty(Yii::$app->i18n->translations[$tcCat])) {
+                $this->params['label'] = Yii::t($tc, $this->params['label']);//var_dump($this->params['label']);
+            }
         }
         
         // debug show routes
