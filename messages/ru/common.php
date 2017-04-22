@@ -1,6 +1,7 @@
 <?php
 //ru
 return [
+    'Module'                    => 'Модуль',
 
 // asb\yii2\widgets\grid\ButtonedActionColumn
     'Search'                    => 'Поиск',

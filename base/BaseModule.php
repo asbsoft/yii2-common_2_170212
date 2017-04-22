@@ -275,9 +275,11 @@ class BaseModule extends Module
                 throw new Exception("Insufficient 'link' or 'action' in 'startLink' paremeter of routeConfig");
             }
             
-            $tc = TranslationsBuilder::getBaseTransCategory($this) . '/module';//var_dump($tc,Yii::$app->language);
+            $tcCat = TranslationsBuilder::getBaseTransCategory($this);
+            $tc = $tcCat . '/module';//var_dump($tc,Yii::$app->language);
+            $label = $routeConfig['startLink']['label'];
             $linkData = [
-                'label' => Yii::t($tc, $routeConfig['startLink']['label']),
+                'label' => empty(Yii::$app->i18n->translations[$tcCat]) ? $label : Yii::t($tc, $label),
                 'link'  => $url,
             ];
             if (isset($route)) $linkData['route'] = $route;

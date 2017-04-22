@@ -11,7 +11,7 @@ use Yii;
  */
 class UniModule extends UniBaseModule
 {
-    static $tc = 'app/sys/module';
+    public static $tc = 'common';
 
     /** Get some module info
      *  @param string $cmd

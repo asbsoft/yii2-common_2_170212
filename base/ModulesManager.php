@@ -26,7 +26,7 @@ class ModulesManager implements ModulesManagerInterface
     public static $submodulesConfigFname = '@asb/yii2/common_2_170212/config/submodules-default.php';
 
     /** Translation category */
-    public static $tc = 'app/sys/module';
+    public static $tc = 'common';
 
     protected static $_submodsConfig;
     /**
@@ -134,7 +134,9 @@ class ModulesManager implements ModulesManagerInterface
             $label = $modmgr::registeredModuleName($module->uniqueId);
         }
         if (empty($label) && $module instanceof UniModule) $label = $module->inform('label');
-        if (empty($label)) $label = Yii::t(self::$tc, 'Module') . ' ' . $module->uniqueId;
+        if (empty($label)) {
+                $label = Yii::t(self::$tc, 'Module') . ' ' . $module->uniqueId;
+        }
 
         if ($module != Yii::$app) { // skip application itself
             if (!$onlyUniModule || $module instanceof UniModule) {
