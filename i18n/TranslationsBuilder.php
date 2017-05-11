@@ -29,24 +29,27 @@ class TranslationsBuilder extends Component
             //!! problems can be for modules: 'a/z/a/z' -> 'z.a.z.a*', 'z/a/z' -> 'z.a.z*'
             // after krsort(Yii::$app->i18n->translations) category 'z.a.z*' stay first and catch requests with 'z.a.z.a*'
 //*
-            //!? need but problems
+            // may be problem - category 'sys/content*' must be before 'sys*' - need krsort(Yii::$app->i18n->translations)
             $baseTransCategory = $module->uniqueId;
             $baseTransCategory = static::$transCatPrefix . '/' . $module->uniqueId;
 /**/
-        }//var_dump($baseTransCategory);
+        }//echo __METHOD__;var_dump($baseTransCategory);
         return $baseTransCategory;
     }
 
     /**
      * Build default initial module translations, file maps, etc.
      * @param asb\yii2\common_2_170212\base\UniModule $module module instance
+     * @param boolean $rewrite if true necessary to rewrite translations
      */
-    public static function initTranslations($module)
+    public static function initTranslations($module, $rewrite = false)
     {
         $baseTransCategory = static::getBaseTransCategory($module);
         $module->templateTransCat = $baseTransCategory . '*';//echo"templateTransCat:'{$module->templateTransCat}'<br>";
 
-        if (empty(static::$transCatToModule[$module->templateTransCat]))
+        //echo __METHOD__;var_dump(array_keys(static::$transCatToModule));
+
+        if ($rewrite || empty(static::$transCatToModule[$module->templateTransCat]))
         {
             static::$transCatToModule[$module->templateTransCat] = $module;//foreach(static::$transCatToModule as $tc => $m) echo "$tc => {$m::ClassName()}<br>";
 
@@ -106,6 +109,9 @@ class TranslationsBuilder extends Component
 
             krsort(Yii::$app->i18n->translations); //!! category 'sys/content*' must be before 'sys*'
             krsort(static::$transCatToModule);     // same problem
+
+            $msg = __FUNCTION__ . "(): loaded translations for module '{$module->uniqueId}': " . $module::className();//echo __METHOD__;var_dump($msg);
+            Yii::trace($msg);
         }
     }
 
