@@ -41,9 +41,9 @@ class CommonBootstrap implements BootstrapInterface
         }//var_dump(Yii::$aliases);exit;
 
         // create common uploads dir and it's mirror in web root
-        $dir = Yii::getAlias('@uploadspath');
+        $dir = realpath(Yii::getAlias('@uploadspath'));//echo __METHOD__.':@uploadspath=';var_dump($dir);
         if (!is_dir($dir)) @FileHelper::createDirectory($dir);
-        $dir = Yii::getAlias('@webfilespath');
+        $dir = realpath(Yii::getAlias('@webfilespath'));//echo __METHOD__.':@webfilespath=';var_dump($dir);
         if (!is_dir($dir)) @FileHelper::createDirectory($dir);
 
         //LangHelper::appendDefLangToHomeUrl($app);
