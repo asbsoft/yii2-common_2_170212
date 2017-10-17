@@ -10,11 +10,16 @@
             "email": "ab2014box@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "asb\\yii2\\": ""
+        }
+    },
     "require": {
         "php": ">=5.4.0",
         "yiisoft/yii2": "~2.0.10",
 
-        "yiisoft/yii2-jui": "*",
+        "yiisoft/yii2-jui": "~2.0.4",
         "yiisoft/yii2-imagine": "2.*",
 
         "mihaildev/yii2-ckeditor": "*",
@@ -24,13 +29,19 @@
     },
     "repositories": [
         {
-            "type": "git",
-            "url": "https://github.com/lafeber/world-flags-sprite"
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "lafeber/world-flags-sprite",
+                "version": "1",
+                "dist": {
+                    "url": "https://github.com/lafeber/world-flags-sprite/archive/master.zip",
+                    "type": "zip"
+                }
+            }
         }
-    ],
-    "autoload": {
-        "psr-4": {
-            "asb\\yii2\\": ""
-        }
-    }
+    ]
 }
