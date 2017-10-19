@@ -270,7 +270,7 @@
         },
         {
             "name": "lafeber/world-flags-sprite",
-            "version": "1",
+            "version": "3.1.7",
             "dist": {
                 "type": "zip",
                 "url": "https://github.com/lafeber/world-flags-sprite/archive/master.zip",
