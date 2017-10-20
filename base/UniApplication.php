@@ -4,6 +4,8 @@ namespace asb\yii2\common_2_170212\base;
 
 use yii\web\Application;
 
+use Yii;
+
 class UniApplication extends Application
 {
     const APP_TYPE_UNITED   = 'united';
@@ -19,5 +21,24 @@ class UniApplication extends Application
 
     /** Application type */
     public $type = self::APP_TYPE_UNITED;
+
+    /** Alternate bower alias */
+    public $altBowerAlias = '@vendor/bower-asset';
+
+    /**
+     * @inheritdoc
+     */
+    public function setVendorPath($path)
+    {
+        parent::setVendorPath($path);
+
+        $bowerDir = Yii::getAlias('@bower');
+        if (!is_dir($bowerDir)) {
+            $altDir = Yii::getAlias($this->altBowerAlias);
+            if (is_dir($altDir)) {
+                Yii::setAlias('@bower', $this->altBowerAlias);
+            }
+        }//echo __METHOD__;var_dump(Yii::$aliases);exit;
+    }
 
 }
