@@ -4,5 +4,5 @@
 
 $vendorDir = dirname(dirname(dirname(__DIR__))) . '/vendor';
 
-require_once($vendorDir . '/studio-42/elfinder/php/autoload.php');
-
+$file = $vendorDir . '/studio-42/elfinder/php/autoload.php';
+if (is_file($file)) require_once($file); // need if ElFinder-package was installed manually without Composer service

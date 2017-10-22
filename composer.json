@@ -11,6 +11,9 @@
         }
     ],
     "autoload": {
+        "files": [
+            "autoload.php"
+        ],
         "psr-4": {
             "asb\\yii2\\": ""
         }
