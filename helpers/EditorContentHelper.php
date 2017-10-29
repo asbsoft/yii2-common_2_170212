@@ -77,16 +77,23 @@ class EditorContentHelper extends Object
      * Convert upload path to web URL.
      * Work only if alias @uploads is subdir of alias @webroot.
      * @param string $path
+     * @param string $uploadsAlias alias for uploads path in filesystem (non-standard for Yii2)
+     * @param string $webfilesurlAlias alias/subdir - path from webroot to uploads directory
      * @return string
      */
-    static function uploadUrl($path = '')
+    public static function uploadUrl($path = '', $uploadsAlias = '@uploads', $webfilesurlAlias = 'uploads')
     {//echo __METHOD__."('$path')";
         $path = str_replace('\\', '/', $path);
         $webroot = str_replace('\\', '/', Yii::getAlias('@webroot'));
-        $uploads = str_replace('\\', '/', Yii::getAlias('@uploads'));
-        $subdir = str_replace($webroot, '', $uploads);
-        $web = Yii::getAlias('@web');
-        $result = $web . $subdir . (empty($path) ? '' : '/' . $path);//echo'result:';var_dump($result);
+        $uploads = str_replace('\\', '/', Yii::getAlias($uploadsAlias));//var_dump($uploads);
+
+        //$subdir = str_replace($webroot, '', $uploads); // work correct only if uploads path is insite web root
+        $subdir = str_replace($uploads, '', $path);//var_dump($subdir);
+
+        $web = Yii::getAlias('@web'); 
+        $files = Yii::getAlias($webfilesurlAlias);//var_dump($files);
+        $result = $web . (empty($web) ? '' : '/' ) . $files . $subdir;//echo'result:';var_dump($result);exit;
+
         return $result;
     }
 

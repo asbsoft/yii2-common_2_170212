@@ -46,7 +46,7 @@ class BaseController extends Controller
             static::$errorActionUniqueId = Yii::$app->errorHandler->errorAction;
         }
 
-        if (!empty($this->module->templateTransCat)) {//
+        if (!empty($this->module->templateTransCat)) {
             $this->tcModule      = $this->module->tcModule;
             $this->tcModels      = $this->module->tcModels;
             $this->tcControllers = $this->module->tcControllers;
