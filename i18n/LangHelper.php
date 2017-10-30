@@ -44,8 +44,8 @@ class LangHelper extends BaseLangHelper
         'appTypePrefix'          => 'basic',
         'sessionDefaultLanguage' => 'session-default-language',
         'cookieDefaultLanguage'  => 'default-language', // if define default language will get from cookie
-        'langCookieExpiredSec'   => 2592000, // 1day = 86400sec
-      //'langCookieExpiredSec'   => 1, // 1sec - to disable saving
+      //'langCookieExpiredSec'   => 2592000, // 30days, 1day = 86400sec
+        'langCookieExpiredSec'   => 1, // 1sec - to disable saving
     ];
 
     /** Result (merged with $Yii::app) parameters */
@@ -59,6 +59,7 @@ class LangHelper extends BaseLangHelper
     protected static function parameter($alias)
     {//var_dump(static::$_params);
         if (empty(static::$_params)) {
+            /* deprecated
             if (isset(Yii::$app->params[self::className()]) && is_array(Yii::$app->params[self::className()]) ) {
                 //var_dump(Yii::$app->params[self::className()]);
                 static::$_params = ArrayHelper::merge(
@@ -66,24 +67,29 @@ class LangHelper extends BaseLangHelper
                   , Yii::$app->params[self::className()]
                 );
             }
+            */
+            static::$_params = static::$defaultParams;//
+            if (isset(Yii::$app->lang->params) && is_array(Yii::$app->lang->params) ) {
+                static::$_params = ArrayHelper::merge(static::$defaultParams, Yii::$app->lang->params);
+            }
+            if (!empty(Yii::$app->lang->langsConfigFname)) {
+                static::$_params['langsConfigFname'] = Yii::$app->lang->langsConfigFname;
+            }
         }//var_dump(static::$_params);exit;
         return static::$_params[$alias];
     }
 
     /**
-     * Get languages infos from file.
+     * Get languages infos.
      * @return array
      */
     public static function getDefaultLanguagesConfig()
     {
-/*
-        if (!empty(Yii::$app->params[static::$paramDefaultLangsConfig])) {
-            return include(Yii::getAlias(Yii::$app->params[static::$paramDefaultLangsConfig]));
+        if (!empty(Yii::$app->lang->langsConfig)) {
+            return Yii::$app->lang->langsConfig;
         } else {
-            return include(Yii::getAlias(static::$langsConfigFname));
+            return include(Yii::getAlias(static::parameter('langsConfigFname')));
         }
-*/
-        return include(Yii::getAlias(static::parameter('langsConfigFname')));
     }
     
     /**
@@ -94,14 +100,7 @@ class LangHelper extends BaseLangHelper
     public static function langModule($uniqueId = null)
     {
         if (empty($uniqueId)) $uniqueId = static::parameter('langModuleUniqueId');
-/*
-        $modules = Yii::$app->loadedModules;//var_dump(array_keys($modules));
-        foreach ($modules as $module) {
-            if ($module->uniqueId == $uniqueId) return $module;
-        }
-        return null;
-*/
-        $module = Yii::$app->getModule($uniqueId);//var_dump($module);
+        $module = Yii::$app->getModule($uniqueId);
         return $module;
     }    
     

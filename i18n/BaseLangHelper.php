@@ -12,13 +12,16 @@ use yii\base\Object;
 class BaseLangHelper extends Object
 {
     /**
-     * Get basic active languages (as arrays) array according to sort criteria.
+     * Get basic active languages array according to sort criteria.
      * @return array of Lang objects
      */
     public static function activeLanguagesArray()
     {
-        $langList = include(dirname(__DIR__) . '/config/langs-default.php');
-        return $langList;
+        if (!empty(Yii::$app->lang->langsConfig)) {
+            return Yii::$app->lang->langsConfig;
+        } else {
+            return include(dirname(__DIR__) . '/config/langs-default.php');
+        }
     }
     
     /**
