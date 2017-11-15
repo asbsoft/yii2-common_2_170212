@@ -69,11 +69,13 @@ class LangHelper extends BaseLangHelper
             }
             */
             static::$_params = static::$defaultParams;//
-            if (isset(Yii::$app->lang->params) && is_array(Yii::$app->lang->params) ) {
-                static::$_params = ArrayHelper::merge(static::$defaultParams, Yii::$app->lang->params);
-            }
-            if (!empty(Yii::$app->lang->langsConfigFname)) {
-                static::$_params['langsConfigFname'] = Yii::$app->lang->langsConfigFname;
+            if (!empty(Yii::$app->lang)) {
+                if (isset(Yii::$app->lang->params) && is_array(Yii::$app->lang->params) ) {
+                    static::$_params = ArrayHelper::merge(static::$defaultParams, Yii::$app->lang->params);
+                }
+                if (!empty(Yii::$app->lang->langsConfigFname)) {
+                    static::$_params['langsConfigFname'] = Yii::$app->lang->langsConfigFname;
+                }
             }
         }//var_dump(static::$_params);exit;
         return static::$_params[$alias];
@@ -85,7 +87,7 @@ class LangHelper extends BaseLangHelper
      */
     public static function getDefaultLanguagesConfig()
     {
-        if (!empty(Yii::$app->lang->langsConfig)) {
+        if (!empty(Yii::$app->lang) && !empty(Yii::$app->lang->langsConfig)) {
             return Yii::$app->lang->langsConfig;
         } else {
             return include(Yii::getAlias(static::parameter('langsConfigFname')));

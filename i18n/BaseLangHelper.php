@@ -17,7 +17,7 @@ class BaseLangHelper extends Object
      */
     public static function activeLanguagesArray()
     {
-        if (!empty(Yii::$app->lang->langsConfig)) {
+        if (!empty(Yii::$app->lang) && !empty(Yii::$app->lang->langsConfig)) {
             return Yii::$app->lang->langsConfig;
         } else {
             return include(dirname(__DIR__) . '/config/langs-default.php');
