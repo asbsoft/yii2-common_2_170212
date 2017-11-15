@@ -3,8 +3,8 @@
 namespace asb\yii2\common_2_170212\i18n;
 
 /**
- * Tis class represents system language.
- * Languages infos save static in config-array.
+ * This class represents system languages.
+ * Languages infos here saved in array in config-file.
  */
 class LangConfigArray extends LangConfigBasic
 {
