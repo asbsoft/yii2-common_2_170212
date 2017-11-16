@@ -6,7 +6,9 @@ use yii\web\AssetBundle;
 
 class FlagAsset extends AssetBundle
 {
-    public $sourcePath = '@vendor/lafeber/world-flags-sprite';
+  //public $sourcePath = '@vendor/lafeber/world-flags-sprite';
+    public $sourcePath = '@vendor/npm-asset/lafeber/world-flags-sprite';
+
     public $css = [
         'stylesheets/flags16.css',
         'stylesheets/flags32.css',

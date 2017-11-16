@@ -28,23 +28,12 @@
         "mihaildev/yii2-ckeditor": "*",
         "mihaildev/yii2-elfinder": "*",
 
-        "lafeber/world-flags-sprite": "*"
+        "npm-asset/world-flags-sprite": "*"
     },
     "repositories": [
         {
             "type": "composer",
             "url": "https://asset-packagist.org"
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "lafeber/world-flags-sprite",
-                "version": "1",
-                "dist": {
-                    "url": "https://github.com/lafeber/world-flags-sprite/archive/master.zip",
-                    "type": "zip"
-                }
-            }
         }
     ]
 }
