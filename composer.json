@@ -15,7 +15,7 @@
             "autoload.php"
         ],
         "psr-4": {
-            "asb\\yii2\\": ""
+            "asb\\yii2\\common_2_170212\\": ""
         }
     },
     "require": {
