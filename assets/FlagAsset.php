@@ -2,12 +2,31 @@
 
 namespace asb\yii2\common_2_170212\assets;
 
+use Yii;
 use yii\web\AssetBundle;
 
 class FlagAsset extends AssetBundle
 {
-  //public $sourcePath = '@vendor/lafeber/world-flags-sprite';
-    public $sourcePath = '@vendor/npm/world-flags-sprite';
+    public $sourcePathPlaces = [ // possible assets places
+        '@vendor/lafeber/world-flags-sprite',
+        '@vendor/bower/world-flags-sprite',
+        '@vendor/bower-asset/world-flags-sprite',
+        '@vendor/npm/world-flags-sprite',
+        '@vendor/npm-asset/world-flags-sprite',
+    ];
+
+    public function init()
+    {
+        parent::init();
+
+        foreach ($this->sourcePathPlaces as $path) {
+            $path = Yii::getAlias($path);
+            if (is_dir($path)) {
+                $this->sourcePath = $path;
+                break;
+            }
+        }
+    }
 
     public $css = [
         'stylesheets/flags16.css',
