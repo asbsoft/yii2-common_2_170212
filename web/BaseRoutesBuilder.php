@@ -16,6 +16,7 @@ use ReflectionClass;
 
 /**
  * Module routes builder
+ * Without caching.
  *
  * @author ASB <ab2014box@gmail.com>
  */

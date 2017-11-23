@@ -3,6 +3,7 @@
 namespace asb\yii2\common_2_170212\base;
 
 use yii\web\Application;
+use asb\yii2\common_2_170212\web\RoutesBuilder;
 
 use Yii;
 
@@ -24,6 +25,16 @@ class UniApplication extends Application
 
     /** Alternate bower alias */
     public $altBowerAlias = '@vendor/bower-asset';
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        RoutesBuilder::saveAppRoutes($this);
+    }
 
     /**
      * @inheritdoc
