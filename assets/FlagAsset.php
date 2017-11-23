@@ -8,11 +8,11 @@ use yii\web\AssetBundle;
 class FlagAsset extends AssetBundle
 {
     public $sourcePathPlaces = [ // possible assets places
-        '@vendor/lafeber/world-flags-sprite',
-        '@vendor/bower/world-flags-sprite',
-        '@vendor/bower-asset/world-flags-sprite',
+        '@vendor/npm-asset/world-flags-sprite', // most probable - first
         '@vendor/npm/world-flags-sprite',
-        '@vendor/npm-asset/world-flags-sprite',
+        '@vendor/bower-asset/world-flags-sprite',
+        '@vendor/bower/world-flags-sprite',
+        '@vendor/lafeber/world-flags-sprite',
     ];
 
     public function init()
