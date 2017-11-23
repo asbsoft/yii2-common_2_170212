@@ -25,44 +25,51 @@ class BaseRoutesBuilder extends Component
     public static $configsSubdir  = 'config';
 
     /**
-     * Build routes group by routes config.
+     * Build routes by routes config.
      * @param array $routeConfig
      * @param yii\base\Application $app
      */
     public static function buildRoutes($routeConfig, $app = null)
-    {//echo __METHOD__;var_dump($routeConfig);
-
+    {
         $app = empty($app) ? Yii::$app : $app;
+        $rules = static::collectRoutes($routeConfig, $app);
+        $app->urlManager->addRules($rules, $routeConfig['append']);
+    }
 
+    /**
+     * Collect routes by routes config.
+     * @param array $routeConfig
+     * @param yii\base\Application $app
+     * @return yii\web\UrlRuleInterface[] rules for UrlManager
+     */
+    public static function collectRoutes($routeConfig, $app = null)
+    {//echo __METHOD__;var_dump($routeConfig);
+        $app = empty($app) ? Yii::$app : $app;
+        $rules = [];
         if (isset($routeConfig['urlPrefix']) && $routeConfig['urlPrefix'] !== false && is_file($routeConfig['fileRoutes'])) {
+            //!! config file use var $routeConfig:
+            $routes = include($routeConfig['fileRoutes']);//var_dump($routes);
+            if (empty($routes)) return [];
 
             switch ($routeConfig['class']) {
                 case GroupUrlRule::className(): // only for this class config-routes-files very simple
-                    $routes = include($routeConfig['fileRoutes']);//var_dump($routes);exit;
-                    if (empty($routes)) break;
-
                     $configGroupRules = [
                         'rules'  => $routes,
                         'prefix' => $routeConfig['urlPrefix'],
                         'routePrefix' => $routeConfig['moduleUid'],
                     ];//var_dump($configGroupRules);
-                    $app->urlManager->addRules([new GroupUrlRule($configGroupRules)], $routeConfig['append']);
+                    $rules = [new GroupUrlRule($configGroupRules)];
                     break;
-
                 default: // universal
-                    //echo __METHOD__;var_dump($routeConfig);
-                    //!! config file use var $routeConfig:
-                    $rules = include($routeConfig['fileRoutes']);//var_dump($rules);exit;
-                    if (empty($rules)) break;
-
-                    if (isset($rules['enablePrettyUrl'])) {
-                        $app->urlManager->enablePrettyUrl = $rules['enablePrettyUrl'];
-                        unset($rules['enablePrettyUrl']);
-                    }//var_dump($rules);exit;
-                    $app->urlManager->addRules($rules, $routeConfig['append']);
+                    if (isset($routes['enablePrettyUrl'])) {
+                        $app->urlManager->enablePrettyUrl = $routes['enablePrettyUrl'];
+                        unset($routes['enablePrettyUrl']);
+                    }
+                    $rules = $routes;
                     break;
             }
         }
+        return $rules;
     }
 
     /**

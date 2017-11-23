@@ -104,7 +104,7 @@ class BaseModule extends Module
      * Get list of base path for all module parents (not container-"parents"!).
      * Also getlist of namespaces for all module parents and update dependencies.
      * This basic version return list with only one path.
-     * @see BaseUniModule - full version
+     * @see UniBaseModule - full version
      * @return array of string
      */
     public function getBasePathList()
@@ -147,10 +147,24 @@ class BaseModule extends Module
 
     /**
      * Add module routes defined in config.
-     * System will use only latest routes, it not mix them with parents routes.
      */
     public function addRoutes()
+    {
+        list($rulesBefore, $rulesAfter) = $this->collectRoutes();
+        Yii::$app->urlManager->addRules($rulesBefore, false);
+        Yii::$app->urlManager->addRules($rulesAfter, true);
+        //echo RoutesInfo::showRoutes($this->uniqueId);exit;
+    }
+
+    /**
+     * Collect module routes defined in config.
+     * System will use only latest (in inheritance chain) module's routes, not mixed with ancestor's routes.
+     * @return array
+     */
+    public function collectRoutes()
     {//echo static::className()."[{$this->uniqueId}]".'@'.__METHOD__.'()<br>';
+        $rulesBefore = [];
+        $rulesAfter = [];
         $isNoname = $this instanceof UniModule ? $this->noname : false;
         if (!$isNoname && !empty($this->routesConfig)) {//var_dump($this->routesConfig);
             //$routesSubdir = $this->getRoutesPath();//var_dump($routesSubdir);
@@ -173,14 +187,21 @@ class BaseModule extends Module
                     if (!isset($routeConfig['append'])) {
                         $routeConfig['append'] = false;
                     }//echo $type;var_dump($routeConfig);
-                    RoutesBuilder::buildRoutes($routeConfig);
 
+                    //RoutesBuilder::buildRoutes($routeConfig); // deprecated, prepare to caching all module's routes together
+                    $nextRules = RoutesBuilder::collectRoutes($routeConfig);//var_dump($nextRules);
+                    if ($routeConfig['append']) {
+                        $rulesAfter = array_merge($rulesAfter, $nextRules);
+                    } else {
+                        $rulesBefore = array_merge($nextRules, $rulesBefore);
+                    }
                     $this->setStartLink($routeConfig);
                 } else {
                     throw new Exception("Routes list file '{$file}' not found!");
                 }
             }
-        }//echo RoutesInfo::showRoutes($this->uniqueId);exit;
+        }//echo"$this->uniqueId";var_dump($rulesBefore);echo'-after-';var_dump($rulesAfter);
+        return [$rulesBefore, $rulesAfter];
     }
 
     /**
