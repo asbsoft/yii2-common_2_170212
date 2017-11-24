@@ -66,8 +66,7 @@ class BaseModule extends Module
      * Another routesConfig parameters:
      *    'startLink' => array('label' => 'Text...', 'link'|'action' => '...')
      *                   (action is 'controller/actionId' without moduleId)
-     * or '
-     startLinkLabel' => 'Text...' (means 'link' => '' by default)
+     * or 'startLinkLabel' => 'Text...' (means 'link' => '' by default)
      *    - define start link with label
      * In array only key 'urlPrefix' is must.
      */
@@ -153,7 +152,7 @@ class BaseModule extends Module
         list($rulesBefore, $rulesAfter) = $this->collectRoutes();
         Yii::$app->urlManager->addRules($rulesBefore, false);
         Yii::$app->urlManager->addRules($rulesAfter, true);
-        //echo RoutesInfo::showRoutes($this->uniqueId);exit;
+        //echo'<pre>'.RoutesInfo::showRoutes($this->uniqueId).'</pre>';exit;
     }
 
     /**

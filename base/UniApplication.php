@@ -4,6 +4,7 @@ namespace asb\yii2\common_2_170212\base;
 
 use yii\web\Application;
 use asb\yii2\common_2_170212\web\RoutesBuilder;
+use asb\yii2\common_2_170212\web\RoutesInfo;
 
 use Yii;
 
@@ -33,7 +34,7 @@ class UniApplication extends Application
     {
         parent::init();
 
-        RoutesBuilder::saveAppRoutes($this);
+        RoutesBuilder::saveAppRoutes($this);//echo'<pre>'.RoutesInfo::showRoutes();exit;
     }
 
     /**

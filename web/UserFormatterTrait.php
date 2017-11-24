@@ -2,9 +2,8 @@
 
 namespace asb\yii2\common_2_170212\web;
 
-use asb\yii2\common_2_170212\web\UserIdentity;
-
 use yii\helpers\Html;
+use Yii;
 
 use Exception;
 
@@ -13,16 +12,21 @@ use Exception;
  */
 trait UserFormatterTrait
 {
-    public static $unexistentUser = '???';
+    public static $unexistentUser = 'user#';
 
-    protected static $_usersList;
+    protected static $_usersNames = [];
 
     public function asUsername($id)
     {
-        if (empty(self::$_usersList)) {
-            self::$_usersList = UserIdentity::usersNames();
+        $identityClass = Yii::$app->user->identityClass;
+
+        if (empty(self::$_usersNames[$id])) {
+            $user = $identityClass::findIdentity($id);
+            if (!empty($user->username)) {
+                self::$_usersNames[$id] = $user->username;
+            }
         }
-        $value = empty(self::$_usersList[$id]) ? static::$unexistentUser : self::$_usersList[$id];
+        $value = empty(self::$_usersNames[$id]) ? (static::$unexistentUser . $id) : self::$_usersNames[$id];
         return Html::encode($value);
     }
 }
