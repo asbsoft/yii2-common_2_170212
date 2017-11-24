@@ -1,7 +1,5 @@
 <?php
 
-use asb\yii2\common_2_170212\web\UserIdentity;
-
 use yii\db\Migration;
 
 //Yii::setAlias('@asb/yii2/common_2_170212', '@vendor/asbsoft/yii2-common_2_170212'); // uncomment if need
