@@ -29,14 +29,17 @@ class RoutesBuilder extends BaseRoutesBuilder
         $app = empty($app) ? Yii::$app : $app;
         $appKey = static::getAppKey($app);//var_dump($appKey);exit;
         $moduleUid = $routeConfig['moduleUid'];
+        $routesType = $routeConfig['routesType'];
 
         static::loadRoutes($app);
-        if (!isset(static::$_routes[$appKey][$moduleUid])) {
+
+        if (!isset(static::$_routes[$appKey][$moduleUid][$routesType])) {
             $msg = "*** Load routes from file for app='$appKey', module='$moduleUid'<br>";
             Yii::trace($msg);//echo $msg;
-            static::$_routes[$appKey][$moduleUid] = parent::collectRoutes($routeConfig, $app);
+            static::$_routes[$appKey][$moduleUid][$routesType] = parent::collectRoutes($routeConfig, $app);
         }
-        return static::$_routes[$appKey][$moduleUid];
+
+        return static::$_routes[$appKey][$moduleUid][$routesType];
     }
 
     /**
