@@ -264,7 +264,7 @@ class BaseModule extends Module
     }
 
     /**
-     * Start links to module - differen for every routesType.
+     * Start links to module - different for every routesType.
      * array[module->uniqueId][routesType] => array[link, label]
      */
     protected static $_startLinks = [];
@@ -296,15 +296,15 @@ class BaseModule extends Module
             }
             
             $tcCat = TranslationsBuilder::getBaseTransCategory($this);
-            $tc = $tcCat . '/module';//var_dump($tc,Yii::$app->language);
             $label = $routeConfig['startLink']['label'];
             $linkData = [
-                'label' => empty(Yii::$app->i18n->translations[$tcCat]) ? $label : Yii::t($tc, $label),
+                'label' => $label,
+                'tcCat' => $tcCat,
                 'link'  => $url,
             ];
             if (isset($route)) $linkData['route'] = $route;
 
-            static::$_startLinks[$this->uniqueId][$routeConfig['routesType']] = $linkData;//var_dump(static::$_startLinks);
+            static::$_startLinks[$this->uniqueId][$routeConfig['routesType']] = $linkData;//var_dump(static::$_startLinks[$this->uniqueId]);
         }
     }
     /**
@@ -313,9 +313,17 @@ class BaseModule extends Module
      * @var string $routesType type of routes collection
      */
     public static function startLink($moduleUid, $routesType)
-    {
+    {//echo __METHOD__."($moduleUid,$routesType)<br>";
         if (!empty(static::$_startLinks[$moduleUid][$routesType])) {
-            return static::$_startLinks[$moduleUid][$routesType];
+            $linkData = static::$_startLinks[$moduleUid][$routesType];//var_dump($linkData);
+
+            $tcCat = $linkData['tcCat'];
+            $tc = "{$tcCat}/module";
+            if (!empty(Yii::$app->i18n->translations["{$tcCat}*"])) {
+                $label = $linkData['label'];
+                $linkData['label'] = Yii::t($tc, $label);//echo"Yii::t('$tc','$label') -> '{$linkData['label']}'<br>";
+            }
+            return $linkData;
         }
         return false;
     }
