@@ -241,4 +241,18 @@ class ModulesManager implements ModulesManagerInterface
         return $result;
     }
 
+    /**
+     * Recursively init all submodules of module.
+     * @param \yii\base\Module $module
+     */
+    public static function initSubmodules($module)
+    {
+        $submodules = ArrayHelper::merge($module->modules, static::submodules($module));//echo"@{$module->uniqueId}={$module::className()}";var_dump(array_keys($submodules));
+        foreach ($submodules as $submoduleId => $submodule) {
+            if (is_array($submodule)) $submodule = $module->getModule($submoduleId);
+            if (empty($submodule)) continue;
+            static::initSubmodules($submodule);
+        }
+    }
+
 }
