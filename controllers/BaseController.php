@@ -32,8 +32,14 @@ class BaseController extends Controller
     /** Translation category personal for this controller */
     public $tc = '';
 
-    /** Data array recommended to use in actions in render calls. Can use in inherited controller. */
+    /** Data params array saving after run action. Can use in inherited controller. */
     public $renderData;
+
+    /** Controller's type */
+    protected $_type = 'frontend';
+
+    /** Login url/route */
+    protected static $_urlLogin;
 
     /**
      * @inheritdoc
@@ -52,16 +58,17 @@ class BaseController extends Controller
             $this->tcControllers = $this->module->tcControllers;
 
             $name = basename($this->className());
-            $name = substr($name, 0, strrpos($name, 'Controller'));//var_dump($name);
+            $name = substr($name, 0, strrpos($name, 'Controller'));
             $id = Inflector::camel2id($name);
-            $this->tc = str_replace('*', "/controller-{$id}", $this->module->templateTransCat);//var_dump($this->tc);
+            $this->tc = str_replace('*', "/controller-{$id}", $this->module->templateTransCat);
         }
 
         // create login link:
         $route = static::urlLogin();
-        // $urlLogin = Yii::$app->urlManager->createUrl($route);
+
         // relative URL will find only in current module, need absolute:
-        $urlLogin = Yii::$app->urlManager->createAbsoluteUrl($route);//var_dump($route);var_dump($urlLogin);exit;
+        // $urlLogin = Yii::$app->urlManager->createUrl($route);
+        $urlLogin = Yii::$app->urlManager->createAbsoluteUrl($route);
         Yii::$app->getUser()->loginUrl = $urlLogin;
 
         Yii::$app->getErrorHandler()->errorAction = static::$errorActionUniqueId;
@@ -71,15 +78,12 @@ class BaseController extends Controller
         }
     }
 
-    /** Controller's type */
-    protected $_type = 'frontend';
     /** Get controller's type */
     public function getType()
     {
         return $this->_type;
     }
 
-    protected static $_urlLogin;
     /**
      * Get login url/route.
      */
@@ -87,7 +91,7 @@ class BaseController extends Controller
     {
         if (!isset(static::$_urlLogin)) {
             static::$_urlLogin = static::$urlLoginDefault;
-        }//echo __METHOD__;var_dump(static::$_urlLogin);//exit;
+        }
         return static::$_urlLogin;
     }
     /**
@@ -104,26 +108,22 @@ class BaseController extends Controller
      * Find layout in containers('parent') modules properties $layouts according to $this->type
      */
     public function findLayoutFile($view)
-    {//echo __METHOD__;var_dump($this->layout);//var_dump($this->module->layoutPath);
-        //var_dump($this->id);var_dump($this->module->id);//var_dump($this->type);
-        //var_dump(parent::findLayoutFile($view));
-
+    {
         // Get custom layout may sent from sitetree-module:
-        $params = Yii::$app->request->getQueryParams();//var_dump($params);
+        $params = Yii::$app->request->getQueryParams();
         if (!empty($params['layout'])) {
             $layout = trim($params['layout']);
-            $layoutFile = Yii::getAlias($layout);//var_dump($layoutFile);
+            $layoutFile = Yii::getAlias($layout);
             if (is_file($layoutFile)) $thisLayout = $layoutFile;
             else if (is_file($layoutFile . '.php')) $thisLayout = $layoutFile . '.php';
             else if (is_file($layoutFile . '.twig')) $thisLayout = $layoutFile . '.twig';
             //else Yii::warning("The view file does not exist: '{$layout}'");
-            //var_dump($thisLayout);
         }
         if (empty($thisLayout)) {
-            $module = $this->module;//var_dump($module->params);exit;
-            while (isset($module)) {//echo"module:{$module->uniqueId}, type:{$this->type}";var_dump($module->layouts);
+            $module = $this->module;
+            while (isset($module)) {
                 if (isset($module->layouts) && isset($module->layouts[$this->type])) {
-                    $parentLayout = $module->layouts[$this->type];//echo"found layout:'{$parentLayout}'<br>";
+                    $parentLayout = $module->layouts[$this->type];
                     $parentLayoutPath = $module->layoutPath;
                     break;
                 }
@@ -138,8 +138,8 @@ class BaseController extends Controller
                         ? Yii::$app->layoutPath
                         : Yii::getAlias($this->module->params['layoutPath'])
                         ;
-                }//echo"layoutPath=$layoutPath";
-                $layoutFile = $layoutPath . '/' . $parentLayout;//var_dump($layoutFile);
+                }
+                $layoutFile = $layoutPath . '/' . $parentLayout;
 
                 if (is_file($layoutFile)) {
                     $thisLayout = $layoutFile;
@@ -148,12 +148,12 @@ class BaseController extends Controller
                 } else if (is_file($layoutFile . '.twig')) {
                     $thisLayout = $layoutFile . '.twig';
                 } else {
-                    $msg = "The view file does not exist: '{$layoutFile}'";//echo $msg;exit;
+                    $msg = "The view file does not exist: '{$layoutFile}'";
                     Yii::warning($msg);
                     return parent::findLayoutFile($view);
                 }
             }
-        }//echo"result layout:'{$thisLayout}'";exit;
+        }
         return $thisLayout;
     }
 
@@ -164,16 +164,16 @@ class BaseController extends Controller
      * @return array of parameters ['name' => 'value']
      */
     public function prepareParams($params = '')
-    {//var_dump($params);
-        $parms = Yii::$app->request->get();//var_dump($parms);
+    {
+        $parms = Yii::$app->request->get();
         $addParms = [];
-        $list = explode('/', $params);//var_dump($list);
+        $list = explode('/', $params);
         foreach ($list as $next) {
             if ($next == '') continue;
             $tmp = explode('=', $next);
             if (count($tmp) > 0) $addParms[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : '';
         }
-        $parms = ArrayHelper::merge($parms, $addParms);//var_dump($parms);exit;
+        $parms = ArrayHelper::merge($parms, $addParms);
         return $parms;
     }
 
@@ -185,15 +185,73 @@ class BaseController extends Controller
     {
         $view_path = $this->module->getViewPath() . DIRECTORY_SEPARATOR . $this->id;
         if (!empty($this->module->parentPath)) // this module is child of another module
-        {//var_dump($view_path);var_dump($this->module->parentPath);
+        {
             if (!is_dir($view_path)) {
-                //$path = $this->module->parentPath . DIRECTORY_SEPARATOR . 'views';//var_dump($path);
+                //$path = $this->module->parentPath . DIRECTORY_SEPARATOR . 'views';
                 $module = $this->module;
-                $path = $this->module->parentPath . DIRECTORY_SEPARATOR . $module::$viewsSubdir;//var_dump($path);
+                $path = $this->module->parentPath . DIRECTORY_SEPARATOR . $module::$viewsSubdir;
                 $this->module->setViewPath($path);
             }
         }
         return parent::getViewPath();
     }
 
+    /**
+     * @inheritdoc
+     * Save render data in $this->renderData
+     */
+    public function render($view, $params = [])
+    {
+        $this->renderData = $params;
+        return parent::render($view, $params);
+    }
+
+    /**
+     * @inheritdoc
+     * Save render data in $this->renderData
+     */
+    public function renderPartial($view, $params = [])
+    {
+        $this->renderData = $params;
+        return parent::renderPartial($view, $params);
+    }
+
+    /**
+     * @inheritdoc
+     * Save render data in $this->renderData
+     */
+    public function renderFile($file, $params = [])
+    {
+        $this->renderData = $params;
+        return parent::renderFile($file, $params);
+    }
+
+    /**
+     * @inheritdoc
+     * Save render data in $this->renderData
+     */
+    public function renderAjax($view, $params = [])
+    {
+        $this->renderData = $params;
+        return parent::renderAjax($view, $params);
+    }
+
+/*
+    /** Data params array using before run action. Can use in inherited controller. *
+/
+    public $renderParams;
+    /**
+     * @inheritdoc
+     * Use to mix params with $this->renderParams for append missing data on inheritance.
+     *
+/
+    public function runAction($id, $params = [])
+    {
+        if (!empty($this->renderParams)) {
+            $params = ArrayHelper::merge($this->renderParams, $params);
+            $this->renderParams = null;
+        }
+        return parent::runAction($id, $params);
+    }
+/**/
 }
