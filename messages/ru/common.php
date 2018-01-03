@@ -1,4 +1,4 @@
-<?php
+<?php //!! UTF-8
 //ru
 return [
     'Module'                    => 'Модуль',

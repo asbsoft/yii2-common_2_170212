@@ -11,7 +11,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Modules manager.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class ModulesManager implements ModulesManagerInterface
 {
@@ -34,28 +34,27 @@ class ModulesManager implements ModulesManagerInterface
      * @return array
      */
     public static function submodsConfig()
-    {//echo __METHOD__;
+    {
         if (empty(static::$_submodsConfig)) {
             static::$_submodsConfig = include(Yii::getAlias(static::$submodulesConfigFname));
-        }//var_dump(static::$_submodsConfig);exit;
+        }
         return static::$_submodsConfig;
     }
 
     protected static $_modmgr;
-    /** Get modules manager instance */
+    /**
+     * Get modules manager instance
+     */
     public static function instance()
-    {//echo __METHOD__.'<br>';
+    {
         if (empty(static::$_modmgr)) {
             $module = Yii::$app->getModule(static::$modulesManagerModuleUid);
-            //$module = UniModule::getModuleByUniqueId(static::$modulesManagerModuleUid); //?? infinite loop
-            //$module = false; //!! for debug
-            //var_dump($module);exit;
             if (!empty($module) && $module instanceof UniModule) {
                 static::$_modmgr = $module->getDataModel(static::$modulesManagerModelAlias);
             } else {
                 static::$_modmgr = new static;
             }
-        }//var_dump(static::$_modmgr);//exit;
+        }
         return static::$_modmgr;
     }
 
@@ -81,7 +80,7 @@ class ModulesManager implements ModulesManagerInterface
         if($module instanceof YiiBaseModule) {
             //$module = $module->uniqueId;
             $module = $module::className();
-        }//echo __METHOD__."($module)";var_dump(static::$_modulesWithInstalledSubmodules);
+        }
         if (is_string($module)) {
             if (array_key_exists($module, static::$_modulesWithInstalledSubmodules)) return true;
             if (in_array($module, static::$_modulesWithInstalledSubmodules)) return true;
@@ -101,9 +100,9 @@ class ModulesManager implements ModulesManagerInterface
      */
     public static function submodules($module, $onlyActivated = true)
     {
-        $modmgr = static::instance();//var_dump($modmgr::className());
+        $modmgr = static::instance();
         if (!isset(static::$_additionalSubmodules[$module->uniqueId])) {
-            $result = $modmgr->getSubmodules($module, $onlyActivated);//echo"for:'{$module->uniqueId}':";var_dump(array_keys($result));
+            $result = $modmgr->getSubmodules($module, $onlyActivated);
             $_additionalSubmodules[$module->uniqueId] = $result;
         }
         return $_additionalSubmodules[$module->uniqueId];
@@ -125,10 +124,10 @@ class ModulesManager implements ModulesManagerInterface
     {
         $list = [];
         if (empty($module)) {
-            $module = Yii::$app;//var_dump(array_keys(Yii::$app->modules));
-        }//echo __METHOD__."({$module->uniqueId})<br>";//var_dump(array_keys($module->modules));
+            $module = Yii::$app;
+        }
 
-        $modmgr = static::instance();//var_dump($modmgr::className());exit;
+        $modmgr = static::instance();
 
         if (method_exists ($modmgr, 'registeredModuleName')) {
             $label = $modmgr::registeredModuleName($module->uniqueId);
@@ -152,22 +151,22 @@ class ModulesManager implements ModulesManagerInterface
         }
 
         $staticSubmodules = $module->modules;
-        $dynSubmodules = $modmgr->getSubmodules($module, $onlyActivated);//echo $module->uniqueId;var_dump(array_keys($dynSubmodules));
-        $module->modules = ArrayHelper::merge($dynSubmodules, $staticSubmodules);//echo"+ submodules @ '{$module->uniqueId}':";var_dump(array_keys($module->modules));
-        if (empty($module->modules)) {//var_dump($list);
+        $dynSubmodules = $modmgr->getSubmodules($module, $onlyActivated);
+        $module->modules = ArrayHelper::merge($dynSubmodules, $staticSubmodules);
+        if (empty($module->modules)) {
             return $list;
         }
 
         // add submodules list
-        foreach ($module->modules as $childId => $childModule) {//echo"{$childId} @ {$module->uniqueId}<br>";
-            if (!$onlyLoaded && is_array($childModule)) {//var_dump($childModule);
-                $childModule = $module->getModule($childId);//if(empty($childModule))echo"??empty($childId)<br>";else var_dump($childModule->uniqueId);
-                //$childModule = Yii::$app->getModule($module->uniqueId . '/' . $childId);//var_dump($childModule->uniqueId);
+        foreach ($module->modules as $childId => $childModule) {
+            if (!$onlyLoaded && is_array($childModule)) {
+                $childModule = $module->getModule($childId);
+                //$childModule = Yii::$app->getModule($module->uniqueId . '/' . $childId);
             }
             if ($childModule instanceof YiiBaseModule) {
                 $list += static::modulesNamesList($childModule, $onlyActivated, $forModmgr, $onlyUniModule, $onlyLoaded, $indent);
             }
-        }//var_dump($list);
+        }
         return $list;
     }
 
@@ -180,7 +179,7 @@ class ModulesManager implements ModulesManagerInterface
         if (empty(static::$_submodules)) {
             static::collectSubmoduleClasses(Yii::$app);
             //ksort(static::$_submodules);
-        }//var_dump(static::$_submodules);exit;
+        }
         return static::$_submodules;
     }
     /** Array [module uniqueId => module className] */
@@ -204,7 +203,7 @@ class ModulesManager implements ModulesManagerInterface
      */
     public static function bootstrapList($parentModuleUid = '')
     {
-        $modmgr = static::instance();//var_dump($modmgr::className());
+        $modmgr = static::instance();
         return $modmgr->getBootstrapList($parentModuleUid);
     }
 
@@ -223,8 +222,8 @@ class ModulesManager implements ModulesManagerInterface
      * @return array of submodules configs
      */
     public function getSubmodules($module)
-    {//echo __METHOD__."({$module->uniqueId})<br>";
-        $submodsConfig = static::submodsConfig();//var_dump($submodsConfig);exit;
+    {
+        $submodsConfig = static::submodsConfig();
         $result = [];
         foreach ($submodsConfig as $submodUniqueId => $config) {
             if (($pos = strrpos($submodUniqueId, '/')) !== false) {
@@ -234,10 +233,10 @@ class ModulesManager implements ModulesManagerInterface
                 $parentUid = ''; // Yii::$app
                 $moduleId = $submodUniqueId;
             }
-            if ($parentUid == $module->uniqueId) {//echo "+parentUid='$parentUid',moduleId='$moduleId'<br>";
+            if ($parentUid == $module->uniqueId) {
                 $result[$moduleId] = $config;
             }
-        }//var_dump($result);
+        }
         return $result;
     }
 
@@ -247,7 +246,7 @@ class ModulesManager implements ModulesManagerInterface
      */
     public static function initSubmodules($module)
     {
-        $submodules = ArrayHelper::merge($module->modules, static::submodules($module));//echo"@{$module->uniqueId}={$module::className()}";var_dump(array_keys($submodules));
+        $submodules = ArrayHelper::merge($module->modules, static::submodules($module));
         foreach ($submodules as $submoduleId => $submodule) {
             if (is_array($submodule)) $submodule = $module->getModule($submoduleId);
             if (empty($submodule)) continue;

@@ -10,7 +10,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Base controller.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class BaseController extends Controller
 {
@@ -67,7 +67,6 @@ class BaseController extends Controller
         $route = static::urlLogin();
 
         // relative URL will find only in current module, need absolute:
-        // $urlLogin = Yii::$app->urlManager->createUrl($route);
         $urlLogin = Yii::$app->urlManager->createAbsoluteUrl($route);
         Yii::$app->getUser()->loginUrl = $urlLogin;
 
@@ -117,7 +116,7 @@ class BaseController extends Controller
             if (is_file($layoutFile)) $thisLayout = $layoutFile;
             else if (is_file($layoutFile . '.php')) $thisLayout = $layoutFile . '.php';
             else if (is_file($layoutFile . '.twig')) $thisLayout = $layoutFile . '.twig';
-            //else Yii::warning("The view file does not exist: '{$layout}'");
+          //else Yii::warning("The view file does not exist: '{$layout}'");
         }
         if (empty($thisLayout)) {
             $module = $this->module;
@@ -236,22 +235,4 @@ class BaseController extends Controller
         return parent::renderAjax($view, $params);
     }
 
-/*
-    /** Data params array using before run action. Can use in inherited controller. *
-/
-    public $renderParams;
-    /**
-     * @inheritdoc
-     * Use to mix params with $this->renderParams for append missing data on inheritance.
-     *
-/
-    public function runAction($id, $params = [])
-    {
-        if (!empty($this->renderParams)) {
-            $params = ArrayHelper::merge($this->renderParams, $params);
-            $this->renderParams = null;
-        }
-        return parent::runAction($id, $params);
-    }
-/**/
 }

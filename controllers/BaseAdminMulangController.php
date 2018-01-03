@@ -9,7 +9,7 @@ use Yii;
 /**
  * Base admin multilang controller.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class BaseAdminMulangController extends BaseAdminController
 {

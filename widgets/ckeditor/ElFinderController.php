@@ -2,7 +2,7 @@
 
 namespace asb\yii2\common_2_170212\widgets\ckeditor;
 
-//use mihaildev\elfinder\PathController as BaseController; // select for use only one (separate) files root for news
+//use mihaildev\elfinder\PathController as BaseController; // select for use only one (separate) files root
 use mihaildev\elfinder\Controller as BaseController; // use for additional common files root
 
 use Yii;
@@ -53,7 +53,7 @@ class ElFinderController extends BaseController
             $this->_addOptions['uploadOrder'] = ['deny', 'allow'];
             $this->_addOptions['uploadDeny']  = ['all'];
             $this->_addOptions['uploadAllow'] = $this->uploadAllow;
-        }//var_dump($this->_addOptions);exit;
+        }
         
         $this->roots = [ // roots of all uploads by default
             [
@@ -77,13 +77,7 @@ class ElFinderController extends BaseController
         if (isset($this->onlyMimes) && is_array($this->onlyMimes)) {
             $options['onlyMimes']   = $this->onlyMimes;
         }
-/* ?? not work here:
-        $options['uploadOrder'] = ['deny', 'allow'];
-        $options['uploadDeny']  = ['all'];
-        if (isset($this->uploadAllow) && is_array($this->uploadAllow)) {
-            $options['uploadAllow'] = $this->uploadAllow;
-        }//var_dump($options);exit;
-*/
+
         return $options;
     }
 

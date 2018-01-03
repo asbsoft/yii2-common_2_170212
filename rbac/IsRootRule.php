@@ -7,6 +7,8 @@ use yii\rbac\Rule;
 
 /**
  * Checks if user is Root
+ *
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class IsRootRule extends Rule
 {
@@ -15,17 +17,15 @@ class IsRootRule extends Rule
     protected $role  = 'roleRoot';
 
     public function execute($userId, $item, $params)
-    {//echo __METHOD__;var_dump($userId);var_dump($item);var_dump($params);
-
+    {
         $identityClass = Yii::$app->user->identityClass;
-        $identity = $identityClass::findIdentity($userId);//var_dump($identity);exit;
+        $identity = $identityClass::findIdentity($userId);
         if (empty($identity)) return false;
 
-        //$hasRole = $identity->hasRole($this->role);//var_dump($hasRole);exit;
+        //$hasRole = $identity->hasRole($this->role);
         $hasRoleRoot = Yii::$app->authManager->getAssignment($this->role, $userId);
         if (empty($hasRoleRoot)) return false;
 
-        //echo 'IsRootRule OK<br>';exit;
         return true;
     }
 }

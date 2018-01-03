@@ -7,7 +7,7 @@ use yii\base\Model as BaseModel;
 /**
  * Class represents language.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class Lang extends BaseModel
 {

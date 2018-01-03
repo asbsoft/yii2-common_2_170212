@@ -11,7 +11,7 @@ use Exception;
 /**
  * Base data model with multi-language support
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class DataModelMultilang extends BaseDataModel
 {
@@ -82,8 +82,8 @@ class DataModelMultilang extends BaseDataModel
      * @return array in format langCode => i18n-model's object
      */
     public function prepareI18nModels()
-    {//echo __METHOD__;var_dump($this->attributes);
-        $mI18n = $this->getJoined()->all();//var_dump($mI18n);exit;
+    {
+        $mI18n = $this->getJoined()->all();
         $modelsI18n = [];
         foreach ($mI18n as $modelI18n) {
             $modelsI18n[$modelI18n->lang_code] = $modelI18n;
@@ -94,7 +94,7 @@ class DataModelMultilang extends BaseDataModel
                 $modelsI18n[$langCode] = $newI18n->loadDefaultValues();
                 $modelsI18n[$langCode]->lang_code = $langCode;
             }
-        }//var_dump($modelsI18n);exit;
+        }
         return $modelsI18n;
     }
 
@@ -128,20 +128,20 @@ class DataModelMultilang extends BaseDataModel
      * @return boolean whether `load()` found the expected form in `$data`.
      */
     public function load($data, $formName = null)
-    {//echo __METHOD__;var_dump($data);
-        $result = parent::load($data, $formName);//var_dump($result);var_dump($this->attributes);
+    {
+        $result = parent::load($data, $formName);
         if ($result) {
             $i18nFormName = $this->module->model(static::$i18n_join_model)->formName();
             foreach ($this->languages as $langCode => $lang) {
                 if (!empty($data[$i18nFormName][$langCode])) {
-                    $i18nResult = $this->i18n[$langCode]->load($data[$i18nFormName][$langCode], '');//var_dump($i18nResult);var_dump($this->i18n[$langCode]->attributes);
+                    $i18nResult = $this->i18n[$langCode]->load($data[$i18nFormName][$langCode], '');
                     if (!$i18nResult) {
                         $this->_errorsI18n[$langCode] = $this->i18n[$langCode]->errors;
                         $result = false;
                     }
                 }
             }
-        }//var_dump($result);var_dump($this->_errorsI18n);exit;
+        }
         return $result;
     }
 
@@ -156,7 +156,7 @@ class DataModelMultilang extends BaseDataModel
      * @return bool whether the saving succeeded (i.e. no validation errors occurred).
      */
     public function saveMultilang($runValidation = true, $attributeNames = null)
-    {//echo __METHOD__;
+    {
         if (empty($this->id)) {
             throw new Exception("Model {$this::className()} can't save multilang data because not set ID in main model");
         }
@@ -164,16 +164,16 @@ class DataModelMultilang extends BaseDataModel
         foreach ($this->languages as $langCode => $lang) {
             $modelI18n = $this->i18n[$langCode];
             $joinKey = static::$i18n_join_prim_key;
-            $modelI18n->$joinKey = $this->id;//var_dump($modelI18n->attributes);
+            $modelI18n->$joinKey = $this->id;
 
             if ($runValidation) {
-                $validResult = $modelI18n->validate($attributeNames);//echo"validate($langCode):";var_dump($validResult,$modelI18n->errors);
+                $validResult = $modelI18n->validate($attributeNames);
                 $result = $result && $validResult;
             }
             if ($result) {
                 if (!method_exists($modelI18n, 'hasData') || $modelI18n->hasData()) { // check model data not empty
-                    $i18nResult = $modelI18n->save(false, $attributeNames);//echo $langCode;var_dump($i18nResult);var_dump($modelI18n->errors);exit;
-                    if (!$i18nResult) {//echo'save err:';var_dump($modelI18n->errors);
+                    $i18nResult = $modelI18n->save(false, $attributeNames);
+                    if (!$i18nResult) {
                         $result = false;
                     }
                 } elseif (!empty($modelI18n->id)) { // if empty i18n-data don't save it or delete it if exists
@@ -183,7 +183,7 @@ class DataModelMultilang extends BaseDataModel
             if (!$result) {
                 $this->_errorsI18n[$langCode] = $modelI18n->errors;
             }
-        }//var_dump($result,$this->_errorsI18n);exit;
+        }
         return $result;
     }
 
@@ -203,7 +203,7 @@ class DataModelMultilang extends BaseDataModel
         try {
             $numRows = 0;
             $result = true;
-            $modelsI18n = $this->i18n;//var_dump($modelsI18n);exit;
+            $modelsI18n = $this->i18n;
             foreach ($modelsI18n as $modelI18n) {
                 $result = $modelI18n->deleteInternal();
                 if ($result === false) break;

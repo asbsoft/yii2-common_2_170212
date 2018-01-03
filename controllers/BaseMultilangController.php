@@ -9,7 +9,7 @@ use Yii;
 /**
  * Base multilang controller.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class BaseMultilangController extends BaseController
 {

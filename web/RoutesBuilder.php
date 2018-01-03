@@ -13,7 +13,7 @@ use Exception;
  * Module routes builder.
  * Caching part.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class RoutesBuilder extends BaseRoutesBuilder
 {
@@ -25,9 +25,9 @@ class RoutesBuilder extends BaseRoutesBuilder
      * @inheritdoc
      */
     public static function collectRoutes($routeConfig, $app = null)
-    {//echo __METHOD__;var_dump($routeConfig);
+    {
         $app = empty($app) ? Yii::$app : $app;
-        $appKey = static::getAppKey($app);//var_dump($appKey);exit;
+        $appKey = static::getAppKey($app);
         $moduleUid = $routeConfig['moduleUid'];
         $routesType = $routeConfig['routesType'];
 
@@ -35,7 +35,7 @@ class RoutesBuilder extends BaseRoutesBuilder
 
         if (!isset(static::$_routes[$appKey][$moduleUid][$routesType])) {
             $msg = "*** Load routes from file for app='$appKey', module='$moduleUid'<br>";
-            Yii::trace($msg);//echo $msg;
+            Yii::trace($msg);
             static::$_routes[$appKey][$moduleUid][$routesType] = parent::collectRoutes($routeConfig, $app);
         }
 
@@ -47,11 +47,11 @@ class RoutesBuilder extends BaseRoutesBuilder
      * @param \yii\base\Application $app
      */
     public static function saveAppRoutes($app = null)
-    {//echo __METHOD__;
+    {
         $app = empty($app) ? Yii::$app : $app;
-        $appKey = static::getAppKey($app);//var_dump($appKey);exit;
+        $appKey = static::getAppKey($app);
 
-        if ($app->cache instanceof Cache && isset(static::$_routes[$appKey])) {//echo __METHOD__;var_dump(static::$_routes[$appKey]);
+        if ($app->cache instanceof Cache && isset(static::$_routes[$appKey])) {
             $app->cache->set($appKey, static::$_routes[$appKey], static::$defaultCacheDuration);
         }
     }
@@ -61,20 +61,20 @@ class RoutesBuilder extends BaseRoutesBuilder
      * @param \yii\base\Application $app
      */
     public static function loadRoutes($app = null)
-    {//echo __METHOD__;
+    {
         $app = empty($app) ? Yii::$app : $app;
-        $appKey = static::getAppKey($app);//var_dump($appKey);exit;
+        $appKey = static::getAppKey($app);
 
         if (!isset(static::$_routes[$appKey])) {
             if ($app->cache instanceof Cache) {
-                $data = $app->cache->get($appKey);//var_dump($data);
+                $data = $app->cache->get($appKey);
                 if ($data !== false && is_array($data)) {
                     static::$_routes[$appKey] = $data;
                 } else {
                     static::$_routes[$appKey] = [];
                 }
             }
-        }//echo __METHOD__;var_dump(static::$_routes[$appKey]);
+        }
     }
 
     /**
@@ -88,7 +88,7 @@ class RoutesBuilder extends BaseRoutesBuilder
             $appKey = $app->appTemplate . '-' . $app->type;
         } else {
             throw new Exception("Can't get application type for non-UniApplication");
-        }//var_dump($appKey);exit;
+        }
         return $appKey;
     }
 

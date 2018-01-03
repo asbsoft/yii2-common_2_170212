@@ -11,7 +11,7 @@ use yii\base\Object;
 /**
  * Missing translation event handler.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class TranslationEventHandler extends Object
 {

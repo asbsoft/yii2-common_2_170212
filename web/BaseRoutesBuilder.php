@@ -18,7 +18,7 @@ use ReflectionClass;
  * Module routes builder
  * Without caching.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class BaseRoutesBuilder extends Component
 {
@@ -44,12 +44,12 @@ class BaseRoutesBuilder extends Component
      * @return yii\web\UrlRuleInterface[] rules for UrlManager
      */
     public static function collectRoutes($routeConfig, $app = null)
-    {//echo __METHOD__;var_dump($routeConfig);
+    {
         $app = empty($app) ? Yii::$app : $app;
         $rules = [];
         if (isset($routeConfig['urlPrefix']) && $routeConfig['urlPrefix'] !== false && is_file($routeConfig['fileRoutes'])) {
             //!! config file use var $routeConfig:
-            $routes = include($routeConfig['fileRoutes']);//var_dump($routes);
+            $routes = include($routeConfig['fileRoutes']);
             if (empty($routes)) return [];
 
             switch ($routeConfig['class']) {
@@ -58,7 +58,7 @@ class BaseRoutesBuilder extends Component
                         'rules'  => $routes,
                         'prefix' => $routeConfig['urlPrefix'],
                         'routePrefix' => $routeConfig['moduleUid'],
-                    ];//var_dump($configGroupRules);
+                    ];
                     $rules = [new GroupUrlRule($configGroupRules)];
                     break;
                 default: // universal
@@ -81,7 +81,7 @@ class BaseRoutesBuilder extends Component
      * @return string new URL-prefix
      */
     public static function correctUrlPrefix($urlPrefix, $module, $type)
-    {//echo __METHOD__."('$urlPrefix', {$module->uniqueId}, $type)<br>";
+    {
         // if $urlPrefix begin with '/' use it as absolute prefix
         if (substr($urlPrefix, 0, 1) == '/') {
             return substr($urlPrefix, 1);
@@ -102,7 +102,7 @@ class BaseRoutesBuilder extends Component
         $module = $module->module;
         if (!empty($module) && $module instanceof UniModule && !empty($module->routesConfig[$type])) {
             return static::correctUrlPrefix($urlPrefix, $module, $type);
-        }//var_dump($urlPrefix);
+        }
         return $urlPrefix;
     }
 
@@ -115,16 +115,16 @@ class BaseRoutesBuilder extends Component
      * This method will use for standard Yii2-modules (non-BaseModule).
      */
     public static function getRoutesFilename($module, $type)
-    {//echo __METHOD__."({$module->className()}, $type)<br>";
+    {
         $class = new ReflectionClass($module);
         $dirname = dirname($class->getFileName());
         $baseFileName = sprintf(BaseModule::$patternRoutesFilename, $type);
         $routesSubdir = $dirname . DIRECTORY_SEPARATOR . static::$configsSubdir;
-        $file = $routesSubdir . '/' . $baseFileName;//echo "file='$file'<br>";
-        if (is_file($file)) {//echo "- found routes config: '$file'<br>";
+        $file = $routesSubdir . '/' . $baseFileName;
+        if (is_file($file)) {
             return $file;
         }
-        if ($module instanceof self) {//exit;
+        if ($module instanceof self) {
             throw new Exception("Routes list file '{$baseFileName}' not found in config(s) folder(s) for module " . $module->className());
         } else {
             return false;

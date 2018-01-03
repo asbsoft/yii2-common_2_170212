@@ -6,7 +6,7 @@
   Default language will be active language ('is_visible' = true) with minimal 'prio'.
   Languages will order by 'prio' values.
 
-  @author ASB <ab2014box@gmail.com>
+  @author Alexandr Belogolovsky <ab2014box@gmail.com>
 */
 return [
 

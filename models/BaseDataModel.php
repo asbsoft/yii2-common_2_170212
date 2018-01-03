@@ -14,9 +14,9 @@ use ReflectionClass;
 /**
  * Base data model.
  *
- * NB! Can't support now some functions for composite primary key.
+ * NB! Can't support some functions for composite primary key.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class BaseDataModel extends ActiveRecord
 {
@@ -43,19 +43,19 @@ class BaseDataModel extends ActiveRecord
      * @inheritdoc
      */
     public function init()
-    {//echo __METHOD__.'<br>';
+    {
         parent::init();
 
         if (empty($this->module)) {
             $rc = new ReflectionClass($this);
-            $modelNamespace = $rc->getNamespaceName();//var_dump($modelNamespace);
+            $modelNamespace = $rc->getNamespaceName();
             $moduleNamespace = substr($modelNamespace, 0, strrpos($modelNamespace, '\\'));
-            $moduleClassName = $moduleNamespace . '\Module';//var_dump($moduleClassName);exit;
+            $moduleClassName = $moduleNamespace . '\Module';
 
             //?? problem: $moduleClassName may be a name of parent class but need latest module class in inheritance hierarchy
-            $this->module = UniModule::getModuleByClassname($moduleClassName);//echo"found module uid={$this->module->uniqueId} noname:";var_dump($this->module->noname);
+            $this->module = UniModule::getModuleByClassname($moduleClassName);
             if ($this->module instanceof UniModule && $this->module->noname) {
-                $moduleClass = UniModule::findModuleByNamespace($moduleNamespace);//echo"UniModule::findModuleByNamespace($moduleNamespace)={$moduleClass}";
+                $moduleClass = UniModule::findModuleByNamespace($moduleNamespace);
                 if (!empty($moduleClass)) {
                     $module = UniModule::getModuleByClassname($moduleClass);
                     if (!$module instanceof UniModule || !$module->noname) {
@@ -63,7 +63,7 @@ class BaseDataModel extends ActiveRecord
                     }
                 }
             }
-        }//var_dump($this->module);exit;
+        }
 
         if (empty($this->module)) {
             throw new Exception("Model {$this::className()} must have 'module' attribute");
@@ -77,15 +77,13 @@ class BaseDataModel extends ActiveRecord
      */
     public function prepare()
     {    
-        //var_dump($this->module->templateTransCat);
         if (!empty($this->module->templateTransCat)) {
             $this->tcModule = $this->module->tcModule;
             $this->tcModels = $this->module->tcModels;
             
             $id = Inflector::camel2id(basename($this->className()));
-            $this->tc = str_replace('*', "/model-{$id}", $this->module->templateTransCat);//var_dump($this->tc);
+            $this->tc = str_replace('*', "/model-{$id}", $this->module->templateTransCat);
         }
-        //deprecated: if (isset($this->module->config)) $this->config = $this->module->config;//var_dump($this->config);
         if (!empty($this->module->params['pageSize'])) {
             $this->pageSize = $this->module->params['pageSize'];
         }
@@ -100,16 +98,16 @@ class BaseDataModel extends ActiveRecord
      */
     public static function tableName()
     {
-        $class = get_called_class();//echo __METHOD__."@{$class}<br>";
+        $class = get_called_class();
         if (empty(static::$_tableName[$class])) {
             $moduleClass = static::moduleClass();
             $module = UniModule::getModuleByClassName($moduleClass);
             if (!empty($module)) {
-                $params = $module->params;//echo $class.'::'.__FUNCTION__."()@module:{$module->uniqueId}";var_dump($params);
+                $params = $module->params;
                 $rc = new ReflectionClass($class);
                 do {
-                    $nextClass = $rc->getName();//var_dump($nextClass);
-                    if (!empty($params[$nextClass]['tableName'])) {//echo"FOUND for $class: params[$nextClass]['tableName']={$params[$nextClass]['tableName']}<br>";
+                    $nextClass = $rc->getName();
+                    if (!empty($params[$nextClass]['tableName'])) {
                         static::$_tableName[$class] = $params[$nextClass]['tableName']; // dont add '{{%}}' here - it may be alian table
                         break;
                     }
@@ -155,17 +153,17 @@ class BaseDataModel extends ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        $this->page = $this->calcPage();//var_dump($this->id);var_dump($this->page);exit;
+        $this->page = $this->calcPage();
     }
 
     /**
      * Calculate page number for current record.
      */
     public function calcPage($currentQuery = null)
-    {//echo __METHOD__;//var_dump($currentQuery);
+    {
         $page = 1;
         $num = $this->getOrderNumber($this->id, $currentQuery);
-        if ($num > 0) $page = (int) ceil($num / $this->pageSize);//echo __METHOD__.":ceil($num/{$this->pageSize})={$page}<br>";exit;
+        if ($num > 0) $page = (int) ceil($num / $this->pageSize);
         return $page;
     }
 
@@ -174,22 +172,21 @@ class BaseDataModel extends ActiveRecord
      * NB!! Return illegal result if orderBy attributes not uniq
      */
     public function getOrderNumber($id, $currentQuery = null)
-    {//echo __METHOD__;var_dump($id);
-        $item = $this->findOne($id);//var_dump($item->attributes);
+    {
+        $item = $this->findOne($id);
         if (!isset($item)) return 0;
 
-        //var_dump($this->orderBy);exit;
         if (empty($currentQuery)) {
             $query = self::find()->orderBy($this->orderBy);
         } else {
             $query = clone $currentQuery; //!
-        }//var_dump($this->orderBy);
+        }
         foreach ($this->orderBy as $prio_field => $direction) {
             $item_prio = $item[$prio_field];
-            $where = [$direction == SORT_ASC ? '<=' : '>=', $prio_field, $item_prio];//var_dump($where);
+            $where = [$direction == SORT_ASC ? '<=' : '>=', $prio_field, $item_prio];
             $query = $query->andWhere($where);
-        }//var_dump($query);
-        $num = $query->count();//var_dump($num);exit;
+        }
+        $num = $query->count();
         return intval($num);
     }
 
@@ -198,7 +195,7 @@ class BaseDataModel extends ActiveRecord
      * Need for calculate number of record in list (and page number).
      */
     public function setOrder($sortParam)
-    {//echo __METHOD__;var_dump($sortParam);var_dump($this->orderBy);
+    {
 
         if (!isset($sortParam) || !is_string($sortParam)) return;
 
@@ -209,7 +206,7 @@ class BaseDataModel extends ActiveRecord
             $direction = SORT_ASC;
         }
         if (array_key_exists($sortParam, $this->attributes)) {
-            $this->orderBy = [$sortParam => $direction];//var_dump($this->orderBy);
+            $this->orderBy = [$sortParam => $direction];
         }
     }
 
@@ -219,17 +216,17 @@ class BaseDataModel extends ActiveRecord
      * @return string|false class name.
      */
     public static function moduleClass($moduleName = 'Module')
-    {//echo __METHOD__;
+    {
         $result = false;
 
-        $class = get_called_class();//var_dump($class);
-        $ns = dirname($class);//var_dump($ns);
+        $class = get_called_class();
+        $ns = dirname($class);
 
         $len = strlen($ns) - strlen(UniModule::$modelsSubdir);
         if (strrpos($ns, UniModule::$modelsSubdir) == $len) {
-           $ns = substr($ns, 0, $len);//var_dump($ns);
+           $ns = substr($ns, 0, $len);
            $result = $ns . $moduleName;
-        }//var_dump($result);exit;    
+        }
 
         return $result;
     }
@@ -240,7 +237,7 @@ class BaseDataModel extends ActiveRecord
      * Consider only first element in array.
      */
     public function orderByToSort()
-    {//echo __METHOD__;var_dump($this->orderBy);
+    {
         $sort = '';
         if (empty($this->orderBy) || !is_array($this->orderBy)) {
             return $sort;
@@ -248,7 +245,7 @@ class BaseDataModel extends ActiveRecord
         foreach ($this->orderBy as $field => $direction) {
             $sort = ($direction == SORT_DESC ? '-' : '') . $field;
             break;
-        }//var_dump($sort);exit;
+        }
         return $sort;
     }
 
@@ -261,7 +258,7 @@ class BaseDataModel extends ActiveRecord
      * @return integer|false looked for record id
      */
     public function getNearId($id, $direction, $where = [], $orderField = 'prio')
-    {//echo __METHOD__."($id,$direction)<br>";var_dump($where);
+    {
         if (!in_array($direction, ['up', 'down'])) return false;
 
         $item = self::findOne(['id' => $id]);
@@ -283,7 +280,7 @@ class BaseDataModel extends ActiveRecord
             ->orderBy($orderBy)
             ->limit(1)
             ->one();
-        $swapId = !empty($swapItem->id) ? $swapItem->id : false;//var_dump($swapId);exit;
+        $swapId = !empty($swapItem->id) ? $swapItem->id : false;
         return $swapId;
     }
 
@@ -295,7 +292,7 @@ class BaseDataModel extends ActiveRecord
      * @return boolean
      */
     public function swapPrio($id1, $id2, $orderField = 'prio')
-    {//echo __METHOD__."($id1,$id2)<br>";
+    {
         $item1 = self::findOne(['id' => $id1]);
         if (!empty($item1->$orderField)) {
             $prio1 = $item1->$orderField;
@@ -307,7 +304,7 @@ class BaseDataModel extends ActiveRecord
             $prio2 = $item2->$orderField;
         } else {
             return false;
-        }//echo "$id1.$orderField=$prio1,$id2.$orderField=$prio2<br>";//exit;
+        }
 
         $transaction = Yii::$app->db->beginTransaction();
         try {

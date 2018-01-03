@@ -22,7 +22,7 @@ namespace asb\yii2\common_2_170212\behaviors;
  *     ];
  * }
  * ```
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class SluggableBehavior extends \yii\behaviors\SluggableBehavior
 {

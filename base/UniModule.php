@@ -8,7 +8,7 @@ use yii\base\InvalidConfigException;
 /**
  * United module.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class UniModule extends UniBaseModule
 {
@@ -20,7 +20,7 @@ class UniModule extends UniBaseModule
      *  @return mix|false|null
      */
     public function inform($cmd, $params = [])
-    {//echo __METHOD__."($cmd)<br>";var_dump($params);
+    {
         switch ($cmd) {
           case 'label': // module's short name for menu
             if (!empty($this->params['label'])) {

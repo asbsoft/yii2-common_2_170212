@@ -15,7 +15,7 @@ define('LANGS_CONFIG_FNAME', dirname(__DIR__) . '/config/langs-default.php');
 /**
  * Lang helper.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class LangHelper extends BaseLangHelper
 {
@@ -57,18 +57,9 @@ class LangHelper extends BaseLangHelper
      * @return string
      */
     protected static function parameter($alias)
-    {//var_dump(static::$_params);
+    {
         if (empty(static::$_params)) {
-            /* deprecated
-            if (isset(Yii::$app->params[self::className()]) && is_array(Yii::$app->params[self::className()]) ) {
-                //var_dump(Yii::$app->params[self::className()]);
-                static::$_params = ArrayHelper::merge(
-                    static::$defaultParams
-                  , Yii::$app->params[self::className()]
-                );
-            }
-            */
-            static::$_params = static::$defaultParams;//
+            static::$_params = static::$defaultParams;
             if (!empty(Yii::$app->langManager)) {
                 if (isset(Yii::$app->langManager->params) && is_array(Yii::$app->langManager->params) ) {
                     static::$_params = ArrayHelper::merge(static::$defaultParams, Yii::$app->langManager->params);
@@ -77,7 +68,7 @@ class LangHelper extends BaseLangHelper
                     static::$_params['langsConfigFname'] = Yii::$app->langManager->langsConfigFname;
                 }
             }
-        }//var_dump(static::$_params);exit;
+        }
         return static::$_params[$alias];
     }
 
@@ -123,24 +114,24 @@ class LangHelper extends BaseLangHelper
      * @return array of Lang objects
      */
     public static function activeLanguages($all = false)
-    {//echo __METHOD__.'<br>';//var_dump(parent::activeLanguages());var_dump(Lang::activeLanguages());exit;
+    {
         if (empty(static::$languagesCache) || empty(static::$languagesAllCache)) {
             static::$languagesCache = [];
-            $langModule = static::langModule();//var_dump($langModule);exit;
+            $langModule = static::langModule();
             //$langModule = null; //!! use for debug
 
             if (!empty($langModule)) {
-                $langModuleHelper = $langModule->getDataModel('LangHelper');//var_dump($langModuleHelper);exit;
+                $langModuleHelper = $langModule->getDataModel('LangHelper');
                 static::$languagesCache = $langModuleHelper::activeLanguages(false);
                 static::$languagesAllCache = $langModuleHelper::activeLanguages(true);
             } else {
-                $languagesArray = static::getDefaultLanguagesConfig();//var_dump($languagesArray);exit;
+                $languagesArray = static::getDefaultLanguagesConfig();
                 $sortedArray = [];
                 foreach ($languagesArray as $lang) {
                     $sortedArray[intval($lang['prio'])] = $lang;
                 }
                 $keys = array_keys($sortedArray);
-                asort($keys);//var_dump($keys);
+                asort($keys);
                 foreach ($keys as $key) {
                     $lang = $sortedArray[$key];
                     $lang['class'] = Lang::className();
@@ -151,9 +142,11 @@ class LangHelper extends BaseLangHelper
                 }
             }
         }
-        //echo count(static::$languagesAllCache);var_dump(static::$languagesCache);var_dump(static::$languagesAllCache);exit;
-        if ($all) return static::$languagesAllCache;
-        else return static::$languagesCache;
+        if ($all) {
+            return static::$languagesAllCache;
+        } else {
+            return static::$languagesCache;
+        }
     }
 
     /**
@@ -161,12 +154,12 @@ class LangHelper extends BaseLangHelper
      * @return array of arrays presents Lang-objects
      */
     public static function activeLanguagesArray()
-    {//echo __METHOD__;
-        $languages = static::activeLanguages();//var_dump($languages);
+    {
+        $languages = static::activeLanguages();
         $langList = [];
         foreach ($languages as $key => $langobj) {
             $langList[$key] = $langobj->getAttributes() + get_object_vars($langobj);
-        }//var_dump($langList);exit;
+        }
         return $langList;
     }
 
@@ -180,7 +173,7 @@ class LangHelper extends BaseLangHelper
      * Run in main bootstrap.
      */
     public static function defaultLanguage($app = null)
-    {//echo __METHOD__;var_dump($app->language);var_dump($GLOBALS['_COOKIE']);
+    {
         if (empty($app)) {
             $app = Yii::$app;
         }
@@ -188,10 +181,10 @@ class LangHelper extends BaseLangHelper
         // get language from session
         if (empty(static::$_defLang)) {
             $name = static::parameter('appTypePrefix') . '-' . static::parameter('sessionDefaultLanguage');
-            if ($name && !empty($app->session[$name])) {//var_dump($_SESSION);
+            if ($name && !empty($app->session[$name])) {
                 $lang = Yii::$app->session[$name];
                 if (in_array($lang, array_keys(static::activeLanguages()))) {
-                    $msg = "get '$lang' from session";//echo"$msg<br>";
+                    $msg = "get '$lang' from session";
                     Yii::trace($msg);
                     static::$_defLang = $lang;
                 }
@@ -201,11 +194,10 @@ class LangHelper extends BaseLangHelper
         // get language from cookie
         if (empty(static::$_defLang)) {
             $name = static::parameter('appTypePrefix') . '-' . static::parameter('cookieDefaultLanguage');
-            //var_dump($name);var_dump($app->request->cookies);var_dump($GLOBALS['_COOKIE']);
             $lang = Yii::$app->getRequest()->getCookies()->getValue($name);
             if ($name && $lang) {
                 if (in_array($lang, array_keys(static::activeLanguages()))) {
-                    $msg = "get '$lang' from cookie";//echo"$msg<br>";
+                    $msg = "get '$lang' from cookie";
                     Yii::trace($msg);
                     static::$_defLang = $lang;
                 }
@@ -214,12 +206,11 @@ class LangHelper extends BaseLangHelper
 
         if (empty(static::$_defLang)) {
             static::$_defLang = static::getFirstActiveLanguageCode();
-            $msg = 'get first active: ' . static::$_defLang;//echo"$msg<br>";
+            $msg = 'get first active: ' . static::$_defLang;
             Yii::trace($msg);
         }
 
-        //$app->language = static::$_defLang; //!! not here
-        //$msg = "set system Yii::app->language from '{$app->language}' to '" . static::$_defLang . "'";//echo"$msg<br>";
+        //$msg = "set system Yii::app->language from '{$app->language}' to '" . static::$_defLang . "'";
         //Yii::trace($msg);
 
         return static::$_defLang;
@@ -230,12 +221,12 @@ class LangHelper extends BaseLangHelper
      * @var string $lang language code
      */
     public static function saveLanguageInSession($lang)
-    {//echo __METHOD__."($lang)";
+    {
         $lang = static::normalizeLangCode($lang);
         $name = static::parameter('appTypePrefix') . '-' . static::parameter('sessionDefaultLanguage');
-        if ($name && in_array($lang, array_keys(static::activeLanguages()))) {//var_dump($name);
+        if ($name && in_array($lang, array_keys(static::activeLanguages()))) {
             Yii::$app->session[$name] = $lang;
-        }//var_dump($_SESSION);
+        }
     }
 
     /**
@@ -244,21 +235,18 @@ class LangHelper extends BaseLangHelper
      * Run in main bootstrap.
      */
     public static function saveCurrentLanguageInCookies($app = null)
-    {//echo __METHOD__;
+    {
         if (empty($app)) $app = Yii::$app;
 
         $app->getResponse()->on(Response::EVENT_BEFORE_SEND, function($event) use($app) {
-            //var_dump($event->sender);
-            //$response0 = $app->getResponse();//var_dump($response0->cookies);
-            $response = $event->sender;//var_dump($response->cookies);
+            $response = $event->sender;
 
             $name = static::parameter('appTypePrefix') . '-' . static::parameter('cookieDefaultLanguage');
-            $lang = static::normalizeLangCode($app->language);//echo __METHOD__;var_dump($name);var_dump($lang);
+            $lang = static::normalizeLangCode($app->language);
 
-            //$domain = $app->request->hostName; //?? not need
             $domain = '';
             
-            $exists = (boolean)$response->cookies->getValue($name);//echo"?exists:";var_dump($exists);
+            $exists = (boolean)$response->cookies->getValue($name);
             
             if ($name && !$exists && in_array($lang, array_keys(static::activeLanguages()))) {
                 $cookie = new Cookie([
@@ -266,12 +254,11 @@ class LangHelper extends BaseLangHelper
                     'value' => $lang,
                     'domain' => $domain,
                     'expire' => time() + static::parameter('langCookieExpiredSec'),
-                ]);//var_dump($cookie);
-                //$response0->getCookies()->add($cookie);
+                ]);
                 $response->getCookies()->add($cookie);
-                $msg = "add new cookie '$name' with value='$lang'";//echo"$msg<br>";
+                $msg = "add new cookie '$name' with value='$lang'";
                 Yii::trace($msg);
-            }//var_dump($event->sender->cookies);var_dump($app->response->cookies);var_dump(Yii::$app->response->cookies);
+            }
         });
     }
 
@@ -284,7 +271,7 @@ class LangHelper extends BaseLangHelper
         if ('' == $langCode) $langCode = Yii::$app->language;
         $langCode2 = substr($langCode, 0, 2);
 
-        $lang = self::findLanguageByCode2($langCode2);//var_dump($lang);exit;
+        $lang = self::findLanguageByCode2($langCode2);
 
         if (isset($lang['name_orig'])) {
             return "+{$lang['name_orig']}={$langCode2}";
@@ -302,11 +289,11 @@ class LangHelper extends BaseLangHelper
         if (empty($app)) $app = Yii::$app;
         $app->on(Application::EVENT_BEFORE_REQUEST, function($event) use($app) {
             // \yii\web\Application->_homeUrl end with '/'
-            $url = $app->getHomeUrl();//echo'before:';var_dump($url);
-            $lang = substr($app->language, 0, 2);//echo (strrpos($url, $lang)) . '<=>' . (count($url) - count($lang) + 1);
+            $url = $app->getHomeUrl();
+            $lang = substr($app->language, 0, 2);
             $needAdd = strrpos($url, $lang) !== (count($url) - count($lang) + 1);
             if ($needAdd) $url .= $lang . '/';
-            $app->setHomeUrl($url);//echo'after:';var_dump($url);
+            $app->setHomeUrl($url);
         });
     }
 

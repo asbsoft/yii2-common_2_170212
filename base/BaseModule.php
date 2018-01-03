@@ -20,7 +20,7 @@ use ReflectionClass;
 /**
  * Common base module.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class BaseModule extends Module
 {
@@ -118,7 +118,7 @@ class BaseModule extends Module
             $this->_pathList[] = $dirname;
             $this->_namespaceList[] = $class->getNamespaceName();
 
-        }//echo __METHOD__.'@'.$this->className();var_dump($this->_pathList);exit;
+        }
         return $this->_pathList;
     }
 
@@ -140,7 +140,7 @@ class BaseModule extends Module
                     break;
                 }
             }
-        }//echo"for {$this->uniqueId} modelsPath:{$this->_modelsPath}<br>";
+        }
         return $this->_modelsPath;
     }
 
@@ -161,12 +161,12 @@ class BaseModule extends Module
      * @return array
      */
     public function collectRoutes()
-    {//echo static::className()."[{$this->uniqueId}]".'@'.__METHOD__.'()<br>';
+    {
         $rulesBefore = [];
         $rulesAfter = [];
         $isNoname = $this instanceof UniModule ? $this->noname : false;
-        if (!$isNoname && !empty($this->routesConfig)) {//var_dump($this->routesConfig);
-            //$routesSubdir = $this->getRoutesPath();//var_dump($routesSubdir);
+        if (!$isNoname && !empty($this->routesConfig)) {
+            //$routesSubdir = $this->getRoutesPath();
             foreach ($this->routesConfig as $type => $config) {
                 if (is_string($config)) { // $config may be '' as urlPrefix
                     $routeConfig = ['urlPrefix' => $config];
@@ -176,7 +176,7 @@ class BaseModule extends Module
                     continue;
                 }
 
-                $file = static::getRoutesFilename($this, $type);//echo"file='$file'<br>";
+                $file = static::getRoutesFilename($this, $type);
                 if (is_file($file)) {
                     $routeConfig['fileRoutes'] = $file;
                     $routeConfig['routesType'] = $type;
@@ -185,10 +185,10 @@ class BaseModule extends Module
                     $routeConfig['urlPrefix']  = $this->collectUrlPrefix($routeConfig['urlPrefix'], $type);
                     if (!isset($routeConfig['append'])) {
                         $routeConfig['append'] = false;
-                    }//echo $type;var_dump($routeConfig);
+                    }
 
                     //RoutesBuilder::buildRoutes($routeConfig); // deprecated, prepare to caching all module's routes together
-                    $nextRules = RoutesBuilder::collectRoutes($routeConfig);//var_dump($nextRules);
+                    $nextRules = RoutesBuilder::collectRoutes($routeConfig);
                     if ($routeConfig['append']) {
                         $rulesAfter = array_merge($rulesAfter, $nextRules);
                     } else {
@@ -199,7 +199,7 @@ class BaseModule extends Module
                     throw new Exception("Routes list file '{$file}' not found!");
                 }
             }
-        }//echo"$this->uniqueId";var_dump($rulesBefore);echo'-after-';var_dump($rulesAfter);
+        }
         return [$rulesBefore, $rulesAfter];
     }
 
@@ -210,22 +210,22 @@ class BaseModule extends Module
      * @return string|false
      */
     public static function getRoutesFilename($module, $type)
-    {//echo __METHOD__."({$module->className()})".'@'.static::className().'<br>';
+    {
         //if (! $module instanceof self) return '';
         //$routesSubdir = $module->getRoutesPath(); // not correct
 
         // find routes from parents modules dirs chain
-        $pathList = $module->getBasePathList();//var_dump($pathList);
+        $pathList = $module->getBasePathList();
         $baseFileName = sprintf(static::$patternRoutesFilename, $type);
         foreach ($pathList as $path) {
             $routesSubdir = $path . DIRECTORY_SEPARATOR . static::$configsSubdir;
-            $file = $routesSubdir . '/' . $baseFileName;//echo "file='$file'<br>";
-            if (is_file($file)) {//echo "- found routes config: '$file'<br>";
+            $file = $routesSubdir . '/' . $baseFileName;
+            if (is_file($file)) {
                 return $file;
             }
         }
         if ($module instanceof self) {
-            $msg = "Routes list file '{$baseFileName}' not found in configs folder(s) for module " . $module->className();//echo $msg;exit;
+            $msg = "Routes list file '{$baseFileName}' not found in configs folder(s) for module " . $module->className();
             throw new Exception($msg);
         } else {
             return false;
@@ -239,10 +239,10 @@ class BaseModule extends Module
      * @return string
      */
     protected function collectUrlPrefix($urlPrefix, $type)
-    {//echo __METHOD__."($urlPrefix, $type) for {$this->uniqueId}<br>";
+    {
         $module = $this;
         while ($module = $module->module) {
-            if (! $module instanceof self) break;//echo"parent:{$module->uniqueId}<br>";var_dump($module->routesConfig);
+            if (! $module instanceof self) break;
             if (empty($module->routesConfig[$type])) continue;
 
             $config = $module->routesConfig[$type];
@@ -259,7 +259,7 @@ class BaseModule extends Module
                     $urlPrefix = "{$parentPrefix}/{$urlPrefix}";
                 }
             }
-        }//echo"result prefix:{$urlPrefix}<br>";
+        }
         return $urlPrefix;
     }
 
@@ -272,23 +272,23 @@ class BaseModule extends Module
      * Set start link for module.
      */
     protected function setStartLink($routeConfig)
-    {//echo __METHOD__."@{$this->uniqueId}";var_dump($routeConfig);
+    {
         if (empty($routeConfig['startLink']) && !empty($routeConfig['startLinkLabel'])) {
             $routeConfig['startLink'] = [
                 'label' => $routeConfig['startLinkLabel'],
                 'link'  => '', // default
             ];
         }
-        if (!empty($routeConfig['startLink'])) {//var_dump($routeConfig['startLink']);echo RoutesInfo::showRoutes($this->uniqueId);
+        if (!empty($routeConfig['startLink'])) {
             if (!empty($routeConfig['startLink']['action'])) {
-                $action = '/' . $routeConfig['moduleUid'] . '/' . $routeConfig['startLink']['action'];//var_dump($action);
+                $action = '/' . $routeConfig['moduleUid'] . '/' . $routeConfig['startLink']['action'];
                 $route = [$action];
                 $url = Url::toRoute($action);
             } elseif (isset($routeConfig['startLink']['link'])) {
-                $link = $routeConfig['startLink']['link'];//var_dump($link);
+                $link = $routeConfig['startLink']['link'];
                 $link = '/' . $routeConfig['urlPrefix']
                        . ( ($link == '' || $link == '?') ? '' : ('/' . $link) )
-                       ;//var_dump($link);
+                       ;
                 //$route = ??;
                 $url = Url::toRoute($link);
             } else {
@@ -304,7 +304,7 @@ class BaseModule extends Module
             ];
             if (isset($route)) $linkData['route'] = $route;
 
-            static::$_startLinks[$this->uniqueId][$routeConfig['routesType']] = $linkData;//var_dump(static::$_startLinks[$this->uniqueId]);
+            static::$_startLinks[$this->uniqueId][$routeConfig['routesType']] = $linkData;
         }
     }
     /**
@@ -313,15 +313,15 @@ class BaseModule extends Module
      * @var string $routesType type of routes collection
      */
     public static function startLink($moduleUid, $routesType)
-    {//echo __METHOD__."($moduleUid,$routesType)<br>";
+    {
         if (!empty(static::$_startLinks[$moduleUid][$routesType])) {
-            $linkData = static::$_startLinks[$moduleUid][$routesType];//var_dump($linkData);
+            $linkData = static::$_startLinks[$moduleUid][$routesType];
 
             $tcCat = $linkData['tcCat'];
             $tc = "{$tcCat}/module";
             if (!empty(Yii::$app->i18n->translations["{$tcCat}*"])) {
                 $label = $linkData['label'];
-                $linkData['label'] = Yii::t($tc, $label);//echo"Yii::t('$tc','$label') -> '{$linkData['label']}'<br>";
+                $linkData['label'] = Yii::t($tc, $label);
             }
             return $linkData;
         }
@@ -352,18 +352,18 @@ class BaseModule extends Module
      *
      */
     public function bootstrap($app)
-    {//echo __METHOD__."@{$this::className()}({$this->uniqueId})<br>";//var_dump($this->bootstrap);var_dump(static::$_bootstrappedModules);
+    {
 
         if (empty(static::$_bootstrappedModules[$this->uniqueId])) {
             static::$_bootstrappedModules[$this->uniqueId] = true;
 
-            TranslationsBuilder::initTranslations($this);//var_dump($this->templateTransCat);
+            TranslationsBuilder::initTranslations($this);
             static::$tc = $this->tcModule;
 
             $this->addRoutes();
 
             // bootstrap submodules such as in yii\base\Application
-            foreach ($this->bootstrap as $class) {//var_dump($class);exit;
+            foreach ($this->bootstrap as $class) {
                 $component = null;
                 if (is_string($class)) {
                     if ($this->has($class)) {

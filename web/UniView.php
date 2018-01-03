@@ -13,7 +13,7 @@ use yii\helpers\ArrayHelper;
  * Common basic view.
  * Help to find view-templates from parent module(s).
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class UniView extends View
 {
@@ -95,7 +95,7 @@ class UniView extends View
     {
         if (empty($this->_viewBlocks[$viewFile])) {
             $this->_viewBlocks[$viewFile] = new UniViewBlocks($viewFile);
-        }//echo __METHOD__;var_dump($this->_viewBlocks);
+        }
         return $this->_viewBlocks[$viewFile];
     }
 
@@ -126,7 +126,7 @@ class UniView extends View
      */
     public function getCurrentBlockFullName()
     {
-        $fullBlockName = '/' . implode('/', static::$_blocksStack);//echo __METHOD__;var_dump($fullBlockName);
+        $fullBlockName = '/' . implode('/', static::$_blocksStack);
         return $fullBlockName;
     }
 
@@ -156,13 +156,13 @@ class UniView extends View
               . " in '{$this->processingViewFile}'"
             );
         }
-        $name = $this->currentBlockName;//echo __METHOD__."($name)@'{$this->viewFile}'<br>";
+        $name = $this->currentBlockName;
 
         $fullBlockName = $this->getCurrentBlockFullName();
 
         array_pop(static::$_blocksStack);
 
-        $content = ob_get_clean();//echo __METHOD__."($name)@'{$this->viewFile}': real content:";var_dump($content);
+        $content = ob_get_clean();
 
         // save every block of every view-file in inherit chain (not only for last) - it will need for render parentBlock
         if (!$this->viewBlocks($this->processingViewFile)->exists($fullBlockName)) {
@@ -362,7 +362,7 @@ class UniView extends View
                 //$file = realpath($file); //!! don't use - if file not found return ''
 
                 // skip view-template-files until $currentViewFile found, get next file
-                if (is_file($file)) {//echo'exists:';var_dump($file);
+                if (is_file($file)) {
                     if (!$skip) {
                         $viewsChain[] = $file;
                     }

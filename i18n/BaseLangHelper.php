@@ -7,7 +7,7 @@ use yii\base\Object;
 /**
  * Base lang helper.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class BaseLangHelper extends Object
 {
@@ -68,8 +68,8 @@ class BaseLangHelper extends Object
      * @return string|false 5-symbols language code or if not found original $langCode or false if $strict
      */
     public static function normalizeLangCode($langCode, $strict = false)
-    {//echo __METHOD__."($langCode)<br>";
-        $langList = static::activeLanguagesArray();//var_dump($langList);
+    {
+        $langList = static::activeLanguagesArray();
         if ($strict) {
             $result = false;
         } else {
@@ -83,7 +83,7 @@ class BaseLangHelper extends Object
             } elseif (strtolower($lang['name_orig']) == strtolower($langCode)) {
                 $result = $lang['code_full'];
             }
-        }//var_dump($result);//exit;
+        }
         return $result;
     }
 
@@ -94,7 +94,7 @@ class BaseLangHelper extends Object
      */
     public static function getLangCode2($langCode)
     {
-        $langList = static::activeLanguagesArray();//var_dump($langList);exit;
+        $langList = static::activeLanguagesArray();
         foreach ($langList as $lang) {
             if ($lang['code3'] == $langCode) return $lang['code2'];
             if ($lang['code_full'] == $langCode) return $lang['code2'];

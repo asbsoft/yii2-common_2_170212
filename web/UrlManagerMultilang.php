@@ -7,12 +7,12 @@ use asb\yii2\common_2_170212\i18n\LangHelper;
 use Yii;
             
 /**
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class UrlManagerMultilang extends UrlManagerBase
 {
     public function init()
-    {//echo __METHOD__;var_dump($this->rules);exit;
+    {
         parent::init();
 
         $this->enablePrettyUrl = true;
@@ -25,8 +25,8 @@ class UrlManagerMultilang extends UrlManagerBase
      * Additional add language info in returned relative URL
      */
     public function createUrl($params)
-    {//echo __METHOD__;var_dump($params);
-        $url0 = parent::createUrl($params);//var_dump($url0);
+    {
+        $url0 = parent::createUrl($params);
 
         if (LangHelper::countActiveLanguages() > 1)
         {
@@ -35,7 +35,7 @@ class UrlManagerMultilang extends UrlManagerBase
                     ? $params['lang']
                   //: Yii::$app->language
                     : LangHelper::defaultLanguage()
-            );//var_dump($lang_code2);
+            );
 
             $baseUrl = $this->showScriptName || !$this->enablePrettyUrl ? $this->getScriptUrl() : $this->getBaseUrl();
 
@@ -44,7 +44,7 @@ class UrlManagerMultilang extends UrlManagerBase
             $url = "{$baseUrl}/{$lang_code2}{$url0}";
         } else {
             $url = $url0;
-        }//var_dump($url);
+        }
         
         return $url;
     }
@@ -53,10 +53,10 @@ class UrlManagerMultilang extends UrlManagerBase
      * @inheritdoc
      */
     public function parseRequest($request)
-    {//echo __METHOD__;var_dump($request->url);
+    {
         //static::processLanguage($request); // already call in UrlManagerBase
 
-        $route = parent::parseRequest($request);//var_dump($route);exit;
+        $route = parent::parseRequest($request);
         return $route;
     }
 

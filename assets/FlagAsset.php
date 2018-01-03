@@ -5,6 +5,9 @@ namespace asb\yii2\common_2_170212\assets;
 use Yii;
 use yii\web\AssetBundle;
 
+/**
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
+ */
 class FlagAsset extends AssetBundle
 {
     public $sourcePathPlaces = [ // possible assets places

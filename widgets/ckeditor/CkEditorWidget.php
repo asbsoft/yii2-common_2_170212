@@ -21,30 +21,30 @@ class CkEditorWidget extends CKEditor
             if ($group == '/') continue; // skip separators
             $toolbarGroups[] = $group;
         }
-        $this->editorOptions['toolbarGroups'] = $toolbarGroups;//var_dump($this->editorOptions['toolbarGroups']);exit;
+        $this->editorOptions['toolbarGroups'] = $toolbarGroups;
     }
 
     /**
      * @inheritdoc
      */
     public static function widget($config = [])
-    {//echo __METHOD__;var_dump($config);exit;
+    {
         if (empty($config['managerOptions'])) { // don't use file manager
             $managerOptions = false;
         } else {
             $managerOptions = $config['managerOptions'];
         }
-        unset($config['managerOptions']);//var_dump($managerOptions);
+        unset($config['managerOptions']);
 
         $editorOptions = $config['editorOptions'];
 
         if ($managerOptions) { // use file manager
 
             $editorOptions = ArrayHelper::merge($editorOptions, [
-'startPath' => $managerOptions['rootPath'],
-'path' => $managerOptions['rootPath'],
+                'startPath' => $managerOptions['rootPath'],
+                'path' => $managerOptions['rootPath'],
             ]);
-            $editorOptions = ElFinder::ckeditorOptions($managerOptions['controller'], $editorOptions);//var_dump($editorOptions);exit;
+            $editorOptions = ElFinder::ckeditorOptions($managerOptions['controller'], $editorOptions);
         } else { // hide filemanager (button 'Image')
             $editorOptions['removeButtons'] = 'Image,ImageButton,Flash';
             switch ($config['editorOptions']['preset']) { // as in parent
@@ -56,7 +56,7 @@ class CkEditorWidget extends CKEditor
                     break;
             }
         }
-        $config['editorOptions'] = $editorOptions;//var_dump($config);exit;
+        $config['editorOptions'] = $editorOptions;
 
         return parent::widget($config);
     }

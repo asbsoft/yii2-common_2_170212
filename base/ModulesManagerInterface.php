@@ -5,7 +5,7 @@ namespace asb\yii2\common_2_170212\base;
 /**
  * Module manager interface.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 interface ModulesManagerInterface
 {

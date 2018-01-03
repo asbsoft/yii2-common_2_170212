@@ -6,6 +6,8 @@ use yii\base\Object;
 
 /**
  * Basic class to represents system language.
+ *
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 abstract class LangConfigBasic extends Object
 {

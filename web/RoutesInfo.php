@@ -10,7 +10,7 @@ use yii\rest\UrlRule as RestUrlRule;
 /**
  * Routes info.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class RoutesInfo
 {
@@ -24,13 +24,13 @@ class RoutesInfo
     {
         $urlMan = Yii::$app->urlManager;
         $result = '';
-        foreach ($urlMan->rules as $rule) {//var_dump($rule);
+        foreach ($urlMan->rules as $rule) {
             if (empty($moduleUid)) {
                 $result .= static::showRoute($rule);
             } else {
                 switch ($rule::className()) {
                     case GroupUrlRule::className():
-                        foreach ($rule->rules as $singleRule) {//var_dump($singleRule->route);
+                        foreach ($rule->rules as $singleRule) {
                             if (0 === strpos($singleRule->route, $moduleUid)) {
                                 $result .= static::showRoute($rule); // will show all rules from group
                                 break;
@@ -43,7 +43,7 @@ class RoutesInfo
                             $controller = $rule->controller[$urlPrefix];
                         } else {
                             $controller = $rule->controller;
-                        }//var_dump($controller);
+                        }
                         if (0 === strpos($controller, $moduleUid)) {
                             $result .= static::showRoute($rule);
                         }
@@ -101,7 +101,7 @@ class RoutesInfo
                 } else {
                     $controller = $rule->controller;
                     $urlPrefix = '';
-                }//var_dump($urlPrefix);var_dump($controller);exit;
+                }
                 $result .= "{$rule::className()}:<br>";
                 foreach ($rule->patterns as $template => $action) {
                     $result .= ' + '

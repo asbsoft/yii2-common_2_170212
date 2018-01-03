@@ -12,7 +12,7 @@ use yii\helpers\FileHelper;
  * Class provide synchronization with uploaded file and its mirror in web root.
  * Upload files area placed not in web root.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class BaseWebFile extends Object
 {
@@ -55,7 +55,7 @@ class BaseWebFile extends Object
      * @param string $fileUrl request pathInfo
      */
     public function __construct($fileUrl, $config = [])
-    {//echo __METHOD__."($fileUrl)<br>";
+    {
         parent::__construct($config);
 
         $this->fileUrl = $fileUrl;
@@ -69,13 +69,13 @@ class BaseWebFile extends Object
         if (strpos($fileUrl, $filesBaseUrl) === 0) {
             $this->_fileSubpath = substr($fileUrl, strlen($filesBaseUrl));
             $this->_format = pathinfo($this->_fileSubpath, PATHINFO_EXTENSION);
-            $this->_srcFilePath  = $this->uploadsRootPath . '/' . $this->_fileSubpath;//echo'src:';var_dump($this->_srcFilePath);
-            $this->_destFilePath = $this->webfileRootPath . '/' . $this->_fileSubpath;//echo'dest:';var_dump($destFilePath);
+            $this->_srcFilePath  = $this->uploadsRootPath . '/' . $this->_fileSubpath;
+            $this->_destFilePath = $this->webfileRootPath . '/' . $this->_fileSubpath;
         } else {
             $this->errmsg = __METHOD__ . ": "
                 . Yii::t($this->tc, "File '{file}' is not from upload mirror area", ['file' => $this->fileUrl]);
             $this->_fileSubpath = false;
-        }//echo __METHOD__;var_dump($this->_fileSubpath);
+        }
     }
 
     protected $_fileBody;
@@ -101,7 +101,7 @@ class BaseWebFile extends Object
      * @return boolean return true if
      */
     public function synchronize()
-    {//echo __METHOD__;
+    {
         if (empty($this->_fileSubpath)) {
             $file = empty($this->_destFilePath) ? $this->fileUrl : $this->_destFilePath;
             $this->errmsg = __METHOD__ . "({$this->fileUrl}): "
@@ -128,7 +128,7 @@ class BaseWebFile extends Object
                 $needUpdate = true;
             }
             $srcTime  = filectime($this->_srcFilePath);
-            $descTime = filectime($this->_destFilePath);//var_dump($srcTime, $descTime);
+            $descTime = filectime($this->_destFilePath);
             if ($srcTime > $descTime) $needUpdate = true;
             if ($needUpdate && !@unlink($this->_destFilePath)) {
                 $this->errmsg = Yii::t($this->tc, "Can't delete file '{file}'", ['file' => $this->_destFilePath]);

@@ -8,7 +8,7 @@ use yii\base\InvalidConfigException;
  * Save blocks defined in views by $this->startBlock($blockName) ... $this->stopBlock().
  * Blocks can be nested that is reflected in block name 'outer/.../inner'.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class UniViewBlocks
 {

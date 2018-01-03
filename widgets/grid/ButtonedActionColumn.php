@@ -10,7 +10,7 @@ use yii\grid\ActionColumn;
  * Extension of ActionColumn for the [[GridView]] widget
  * that displays buttons in search cell instead of autosearch.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class ButtonedActionColumn extends ActionColumn
 {

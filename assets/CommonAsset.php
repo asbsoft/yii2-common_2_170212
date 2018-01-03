@@ -3,13 +3,13 @@
 namespace asb\yii2\common_2_170212\assets;
 
 use yii\web\AssetBundle;
-//use yii\web\View;
 
+/**
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
+ */
 class CommonAsset extends AssetBundle
 {
     public $css = ['common.css'];
-    //public $js = [];
-    //public $jsOptions = ['position' => View::POS_BEGIN];
 
     public function init()
     {

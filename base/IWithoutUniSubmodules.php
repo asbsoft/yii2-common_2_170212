@@ -7,7 +7,7 @@ namespace asb\yii2\common_2_170212\base;
  * that will get by Modules manager.
  * ModulesManager module can't have such submodules to avoid infinitive loop.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 interface IWithoutUniSubmodules
 {

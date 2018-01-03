@@ -14,7 +14,7 @@ use yii\helpers\FileHelper;
 /**
  * Common system bootstrap.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class CommonBootstrap implements BootstrapInterface
 {
@@ -31,24 +31,24 @@ class CommonBootstrap implements BootstrapInterface
         // mirror of uploads files dir in web root
         if (!empty($app->params['webfilesSubdir'])) $this->webfilesSubdir = $app->params['webfilesSubdir'];
         Yii::setAlias('@webfilespath', rtrim(Yii::getAlias('@webroot/' . $this->webfilesSubdir), '/'));
-        Yii::setAlias('@webfilesurl',  rtrim(Yii::getAlias('@web/' . $this->webfilesSubdir), '/'));//var_dump(Yii::$aliases);//exit;
+        Yii::setAlias('@webfilesurl',  rtrim(Yii::getAlias('@web/' . $this->webfilesSubdir), '/'));
 
         // uploads path is common for all Yii2-templates and not placed in web root
         if (empty($app->params['@uploadspath'])) {
             Yii::setAlias('@uploadspath',  dirname($app->vendorPath) . '/uploads'); // default
         } else {
             Yii::setAlias('@uploadspath',  $app->params['@uploadspath']); // default
-        }//var_dump(Yii::$aliases);exit;
+        }
 
         // create common uploads dir and it's mirror in web root
-        $dir = realpath(Yii::getAlias('@uploadspath'));//echo __METHOD__.':@uploadspath=';var_dump($dir);
+        $dir = realpath(Yii::getAlias('@uploadspath'));
         if (!is_dir($dir)) @FileHelper::createDirectory($dir);
-        $dir = realpath(Yii::getAlias('@webfilespath'));//echo __METHOD__.':@webfilespath=';var_dump($dir);
+        $dir = realpath(Yii::getAlias('@webfilespath'));
         if (!is_dir($dir)) @FileHelper::createDirectory($dir);
 
         //LangHelper::appendDefLangToHomeUrl($app);
 
-        $app->language = LangHelper::defaultLanguage($app);//echo __METHOD__;var_dump($app->language);
+        $app->language = LangHelper::defaultLanguage($app);
 
         UrlManagerBase::processLanguage($app->getRequest());
 
@@ -61,7 +61,7 @@ class CommonBootstrap implements BootstrapInterface
             && (strlen(trim($app->request->baseUrl, '/')) != 0 // webroot shift by .htaccess
                 || $app->type == UniApplication::APP_TYPE_UNITED
                 || $app->type == UniApplication::APP_TYPE_BACKEND
-               )) {//echo"correct BaseAdminController::adminPath='".BaseAdminController::$adminPath."' to '{$app->params['adminPath']}'<br>";
+               )) {
             BaseAdminController::$adminPath = $app->params['adminPath'];
         }
     }

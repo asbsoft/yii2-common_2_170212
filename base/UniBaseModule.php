@@ -16,7 +16,6 @@ use Yii;
 use yii\base\Module as YiiBaseModule;
 use yii\base\BootstrapInterface;
 use yii\base\Controller as YiiBaseController;
-//use yii\helpers\ArrayHelper;
 
 use Exception;
 use ReflectionClass;
@@ -24,7 +23,7 @@ use ReflectionClass;
 /**
  * United module. Base part.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class UniBaseModule extends BaseModule
 {
@@ -47,11 +46,11 @@ class UniBaseModule extends BaseModule
      * @inheritdoc
      */
     public function __construct($id, $parent = null, $config = [])
-    {//echo static::ClassName().'@'.__METHOD__."(id='$id'), config:";var_dump($config);
+    {
         $this->_type = static::MODULE_UNITED;
 
         $addConfig = ConfigsBuilder::getConfig($this);
-        $addConfig = ArrayHelper::merge($addConfig, $config);//echo"module($id) result config:";var_dump($addConfig);
+        $addConfig = ArrayHelper::merge($addConfig, $config);
 
         parent::__construct($id, $parent, $addConfig);
     }
@@ -60,16 +59,16 @@ class UniBaseModule extends BaseModule
      * @inheritdoc
      */
     public function init()
-    {//echo __METHOD__.'@'.static::className()."[{$this->uniqueId}]".'<br>';
+    {
         parent::init();
 
         // module which contain ModulesManager must be IWithoutUniSubmodules to avoid infinite loop here
-//*?? move to getModules():
+        //?? move to getModules():
         if (! $this instanceof IWithoutUniSubmodules) {
-            $submodules = ModulesManager::submodules($this);//echo"for {$this::className()}={$this->uniqueId} add submodules ";var_dump(array_keys($submodules));
-            $this->modules = ArrayHelper::merge($this->modules, $submodules);//var_dump($this->modules);
+            $submodules = ModulesManager::submodules($this);
+            $this->modules = ArrayHelper::merge($this->modules, $submodules);
         }
-/**/
+
         $this->setConfigPath();
 
         $this->correctControllerNamespace();
@@ -78,18 +77,9 @@ class UniBaseModule extends BaseModule
 
         // $this->params from config may overwrite params from separate files:
         // get params from separate params-files
-        $addParams = $this->getParameters();//var_dump($addParams);var_dump($this->params);
-/*
-        $diff = @array_diff($addParams, $this->params);//var_dump($diff);
-        if (!empty($diff)) {
-            $this->params = ArrayHelper::merge($addParams, $this->params); //?! duplication elements with number keys detected
-        }//var_dump($this->params);
-*/
-        $this->params = ArrayHelper::mergeNoDouble($addParams, $this->params);
+        $addParams = $this->getParameters();
 
-        // move to bootstrap:
-        //if (!$this->noname) TranslationsBuilder::initTranslations($this);//var_dump($this->templateTransCat);
-        //$this->addRoutes();
+        $this->params = ArrayHelper::mergeNoDouble($addParams, $this->params);
 
         if (empty(static::$_bootstrappedModules[$this->uniqueId])) {
             $this->bootstrap(Yii::$app);
@@ -97,15 +87,15 @@ class UniBaseModule extends BaseModule
 
         // only after bootstrap:
         $tcCat = TranslationsBuilder::getBaseTransCategory($this);
-        $tc = $tcCat . '/module';//echo"for {$this->uniqueId}";var_dump($tc);
-        if (!empty($this->params['label'])) {//var_dump(Yii::$app->language);//?? sometimes == 'en-US'
+        $tc = $tcCat . '/module';
+        if (!empty($this->params['label'])) {
             if (!empty(Yii::$app->i18n->translations[$tcCat])) {
-                $this->params['label'] = Yii::t($tc, $this->params['label']);//var_dump($this->params['label']);
+                $this->params['label'] = Yii::t($tc, $this->params['label']);
             }
         }
         
         // debug show routes
-        //var_dump(array_keys(Yii::$app->loadedModules));echo RoutesInfo::showRoutes();//exit;
+        //var_dump(array_keys(Yii::$app->loadedModules));echo RoutesInfo::showRoutes();
     }
 
     /**
@@ -120,12 +110,12 @@ class UniBaseModule extends BaseModule
         } else {
             // check inheritance of loaded modules
             $class = get_called_class();
-            $result = [];//var_dump(array_keys(Yii::$app->loadedModules));
+            $result = [];
             foreach (Yii::$app->loadedModules as $module) {
                 if ($module instanceof $class) {
                     $result[] = $module;
                 }
-            }//echo __METHOD__."@$class";var_dump($result);exit;
+            }
             if (count($result) == 1) {
                 return $result[0];
             } else {
@@ -152,7 +142,7 @@ class UniBaseModule extends BaseModule
                 $this->setModules($this->_additionalModules); // can overwrite existent modules
             }
         }
-        $result = parent::getModules($loadedOnly);//echo __METHOD__."@{$this->className()}<br>";var_dump(array_keys($result));
+        $result = parent::getModules($loadedOnly);
         return $result;
     }
 
@@ -160,11 +150,11 @@ class UniBaseModule extends BaseModule
      * @inheritdoc
      */
     public function getModule($id, $load = true)
-    {//echo __METHOD__."($id)<br>";
+    {
         $module = parent::getModule($id, $load);
-        if ($module instanceof UniModule) {//var_dump($module->uniqueId);
+        if ($module instanceof UniModule) {
             // add dynamic sub-modules
-            $submodules = $module->getModules();//echo'submodules:';var_dump(array_keys($submodules));
+            $submodules = $module->getModules();
         }
         return $module;
     }
@@ -175,7 +165,7 @@ class UniBaseModule extends BaseModule
     public function bootstrap($app)
     {
         // always make translations
-        TranslationsBuilder::initTranslations($this);//var_dump($this->templateTransCat);
+        TranslationsBuilder::initTranslations($this);
         static::$tc = $this->tcModule;
 
         if (!$this->noname) {
@@ -196,16 +186,16 @@ class UniBaseModule extends BaseModule
 
     /** Set config path first exists in parents modules chain */
     protected function setConfigPath()
-    {//echo $this::ClassName().'@'.__METHOD__.":basePath='{$this->basePath}'<br>";
+    {
         $this->configPath = $this->basePath . '/' . static::$configsSubdir; // default
-        $pathList = $this->getBasePathList();//var_dump($pathList);
+        $pathList = $this->getBasePathList();
         foreach ($pathList as $path) {
             $confPath = $path . '/' . static::$configsSubdir;
             if (is_dir($confPath)) {
                 $this->configPath = $confPath;
                 break;
             }
-        }//echo"- result conf path: {$this->configPath}<br>";
+        }
     }
 
     /**
@@ -213,36 +203,30 @@ class UniBaseModule extends BaseModule
      * @return array
      */
     public function getParameters()
-    {//echo $this::className().'::'.__FUNCTION__.'()<br>';
+    {
         $params = ConfigsBuilder::getConfig($this, 'params');
-/*
-        $tc = TranslationsBuilder::getBaseTransCategory($this) . '/module';//echo"for {$this->uniqueId}";var_dump($tc);
-        if (!empty($params['label'])) {
-            $params['label'] = Yii::t($tc, $params['label']); // InvalidConfigException: Unable to locate message source for category
-        }
-*/
         return $params;
     }
 
     /** Change controllers namespace to first exists in parents modules chain */
     protected function correctControllerNamespace()
-    {//echo $this::ClassName().'@'.__METHOD__.":ns='{$this->controllerNamespace}'<br>";
-        $nsList = $this->getNamespaceList();//var_dump($nsList);
-        $pathList = $this->getBasePathList();//var_dump($pathList);
+    {
+        $nsList = $this->getNamespaceList();
+        $pathList = $this->getBasePathList();
         foreach ($pathList as $i => $path) {
             $controllersPath = $path . '/' . static::$controllersSubdir;
             if (is_dir($controllersPath)) {
                 $this->controllerNamespace = $nsList[$i] . "\\" . static::$controllersSubdir;
                 break;
             }
-        }//echo"- result ns: {$this->controllerNamespace}<br>";
+        }
     }
 
     /** Append to module dependencies parent classes */
     protected function updateDependencies()
-    {//echo __METHOD__."() for {$this->uniqueId}<br>";
+    {
         if (!isset($this->_namespaceList)) {
-            $this->getBasePathList();//var_dump($this->dependencies);
+            $this->getBasePathList();
         }
     }
 
@@ -255,23 +239,23 @@ class UniBaseModule extends BaseModule
      * @return string|null|false module-owner class name or null if not found or false if collision - found more than one module
      */
     public static function findModuleByNamespace($moduleNamespace, $findOnlyParent = true)
-    {//echo __METHOD__."($moduleNamespace)<br>";var_dump(static::$_modulesNs);
+    {
         $result = null;
         foreach (static::$_modulesNs as $class => $nsList) {
             foreach ($nsList as $i => $ns) {
-                if ($ns == $moduleNamespace) {//echo "found {$class}[{$i}] => {$ns}<br>";
-                    if ($findOnlyParent && $i == 0) {//echo "skip<br>";
+                if ($ns == $moduleNamespace) {
+                    if ($findOnlyParent && $i == 0) {
                         continue;
                     }
-                    if (empty($result)) {//echo "save {$class}<br>";
+                    if (empty($result)) {
                         $result = $class;
                     } else {
-                        throw new Exception("Find duplicate namespace '{$moduleNamespace}' for modules '{$result}' and '{$class}'");//!! for debug
+                        throw new Exception("Find duplicate namespace '{$moduleNamespace}' for modules '{$result}' and '{$class}'");
                         //return false;
                     }
                 }
             }
-        }//var_dump($result);exit;
+        }
         return $result;
     }
 
@@ -285,7 +269,7 @@ class UniBaseModule extends BaseModule
         if (!isset($this->_pathList)) {
             $this->_pathList = [];
             $this->_namespaceList = [];
-            $class = new ReflectionClass($this);//var_dump($class);
+            $class = new ReflectionClass($this);
             while (true) {
                 $dirname = dirname($class->getFileName());
                 if ($dirname === __DIR__) break; // don't use this class
@@ -304,7 +288,7 @@ class UniBaseModule extends BaseModule
                     $this->dependencies[] = $class->name;
                 }
             }
-        }//echo __METHOD__.'@'.$this->className();var_dump($this->_pathList);exit;
+        }
         return $this->_pathList;
     }
 
@@ -340,7 +324,7 @@ class UniBaseModule extends BaseModule
                 $module_id = $module->getUniqueId();
                 break;
             }
-        }//var_dump($module_id);exit;
+        }
         return $module_id;
     }
 
@@ -356,7 +340,7 @@ class UniBaseModule extends BaseModule
     {
         $parts = explode('/', $moduleFullId);
         $parts = array_reverse($parts);
-        $revfid = implode($delimiter, $parts);//echo"reverseFullId='$revfid'<br>";exit;
+        $revfid = implode($delimiter, $parts);
         return $revfid;
     }
 
@@ -384,24 +368,22 @@ class UniBaseModule extends BaseModule
      * @return Module object
      */
     public static function getModuleByClassname($moduleClassName, $loadAnonimous = false)
-    {//echo __METHOD__."($moduleClassName)<br>";
-        $result = $moduleClassName::getInstance();//var_dump($result);exit;
+    {
+        $result = $moduleClassName::getInstance();
         if (!empty($result)) {
             return $result; // found from loaded
         }
 
         //?? deprecated: never run here ...
-//*
-        $uid = static::getModuleUidByClassname($moduleClassName);//var_dump($uid);
+        $uid = static::getModuleUidByClassname($moduleClassName);
         if (!empty($uid)) {
-            $result = Yii::$app->getModule($uid);//var_dump($result);
+            $result = Yii::$app->getModule($uid);
             if (!empty($result)) {
                 return $result;
             } else {
                 throw new Exception("Module with uniqueId '{$uid}' was not registered in application");
             }
         }
-/**/
 
         $message = __METHOD__."($moduleClassName): Can't get module by classname '{$moduleClassName}'.";
         if (!$loadAnonimous) {
@@ -409,7 +391,7 @@ class UniBaseModule extends BaseModule
             //throw new Exception($message);
             return null;
         } else {
-            $message .= ' Create anonimous module.';//echo $message;exit;
+            $message .= ' Create anonimous module.';
             Yii::trace($message);
 
             if (!empty(static::$_nonameModules[$moduleClassName])) {
@@ -421,21 +403,18 @@ class UniBaseModule extends BaseModule
                     $result = new $moduleClassName(uniqid(), null); //?! can't set config
                 }
                 if ($result instanceof static) { // need to prepare default UniBaseModule configs
-                    $config = ConfigsBuilder::getConfig($result);//var_dump($result->config);exit;
+                    $config = ConfigsBuilder::getConfig($result);
                     Yii::configure($result, $config);
                     $addParams = $result->getParameters(); // from params-files
                     $result->params = ArrayHelper::merge($addParams, $result->params);
                 }
-                static::$_nonameModules[$moduleClassName] = $result;//var_dump(static::$_nonameModules[$moduleClassName]);
+                static::$_nonameModules[$moduleClassName] = $result;
                 //static::setInstance($result); //?? save this module in Yii::$app->loadedModules
-            }//var_dump($result);
+            }
         }
         return $result;
     }
 
-//?? deprecated
-//!! This method will load all modules in system if need.
-//todo cache
     /**
      * Find uniqueId module by it's className in module/application.
      * Will find only latest className in inheritance chain.
@@ -444,24 +423,15 @@ class UniBaseModule extends BaseModule
      * @return string|false module uniqueId
      */
     public static function getModuleUidByClassname($moduleClassName, $moduleContainer = null)
-    {//echo __METHOD__."($moduleClassName,".(empty($moduleContainer)?'null':$moduleContainer->uniqueId).')<br>';
+    {
         if ($moduleContainer == null) {
             $moduleContainer = Yii::$app; // start from ancestor-container
         }
-/*
-        if (is_array($moduleContainer)) {//
-echo __METHOD__."($moduleClassName,".(empty($moduleContainer)?'null':$moduleContainer->uniqueId).')<br>';
-var_dump($moduleContainer);exit;
-
-//todo... load
-
-        }
-*/
         if ($moduleContainer instanceof YiiBaseModule) {
              if ($moduleContainer::className() == $moduleClassName) {
                  return $moduleContainer->uniqueId;
              }
-             $subModules = $moduleContainer->getModules($loadedOnly = false);//var_dump(array_keys($subModules));
+             $subModules = $moduleContainer->getModules($loadedOnly = false);
              foreach ($subModules as $subModule) {
                  $uid = static::getModuleUidByClassname($moduleClassName, $subModule);
                  if ($uid) return $uid;
@@ -472,9 +442,9 @@ var_dump($moduleContainer);exit;
 
     /** Find module by unique Id from loaded modules */
     public static function getModuleByUniqueId($uniqueId)
-    {//echo __METHOD__."($uniqueId)<br>";
-        $modules = Yii::$app->loadedModules;//var_dump(array_keys($modules));
-        foreach ($modules as $module) {//var_dump($module->uniqueId);
+    {
+        $modules = Yii::$app->loadedModules;
+        foreach ($modules as $module) {
             if ($module->uniqueId == $uniqueId) return $module;
         }
         return false;
@@ -482,19 +452,19 @@ var_dump($moduleContainer);exit;
 
     /** Find UniModule by unique Id from loaded modules */
     public static function getUniModuleByUniqueId($uniqueId)
-    {//echo __METHOD__."($uniqueId)<br>";
+    {
         $module = static::getModuleByUniqueId($uniqueId);
         if ($module instanceof UniModule) return $module;
         else return false;
     }
 
     public static function getModuleByBasePath($modulePath)
-    {//echo __METHOD__;echo"('{$modulePath}'):<br>";
-        $modules = Yii::$app->loadedModules;//echo'loadedModules:';var_dump(array_keys($modules));
+    {
+        $modules = Yii::$app->loadedModules;
         foreach ($modules as $module) {
             if ($module instanceof UniModule) {
                 $class = new ReflectionClass($module);
-                $classPath = dirname($class->getFileName());//var_dump($classPath);
+                $classPath = dirname($class->getFileName());
                 if ($modulePath == $classPath) return $module;
             }
         }
@@ -506,18 +476,18 @@ var_dump($moduleContainer);exit;
      * If controller not found in $this->controllerNamespace it will find in inheritance-parent modules chain.
      */
     public function createControllerByID($id)
-    {//echo __METHOD__."($id)<br>";
+    {
         $result = parent::createControllerByID($id);
         if (!empty($result)) return $result;
 
         $saveNs = $this->controllerNamespace;
 
-        $nsList = $this->getNamespaceList();//var_dump($nsList);
+        $nsList = $this->getNamespaceList();
         foreach ($nsList as $ns) {
             $this->controllerNamespace = $ns . "\\" . static::$controllersSubdir;
             $result = parent::createControllerByID($id);
             if (!empty($result)) break;
-        }//var_dump($result);exit;
+        }
 
         $this->controllerNamespace = $saveNs;
         return $result;
@@ -545,7 +515,7 @@ var_dump($moduleContainer);exit;
                     break;
                 }
             }
-        }//echo"for {$this->uniqueId} ctrPath:{$this->_controllersPath}<br>";
+        }
         return $this->_controllersPath;
     }
 
@@ -568,11 +538,10 @@ var_dump($moduleContainer);exit;
                     break;
                 }
             }
-        }//echo"for {$this->uniqueId} ctrPath:{$this->_viewsPath}<br>";
+        }
         return $this->_viewsPath;
     }
 
-//--- BEGIN: Some functionality to access models of module
 
     /** Data models defined in config params: 'ALIAS' => 'CLASS' */
     protected $_models = [];
@@ -619,7 +588,7 @@ var_dump($moduleContainer);exit;
      * @return yii\base\Model
      */
     public function getDataModel($alias, $params = [], $config = [])
-    {//echo __METHOD__."({$alias})@".$this::className().'<br>';var_dump($this->_models);
+    {
         if (!empty($this->_models[$alias])) {
             //$model = new $this->models[$alias](['module' => $this]); // only for asb\yii2\models\DataModel
             $model = Yii::createObject($this->models[$alias], $params);
@@ -631,7 +600,7 @@ var_dump($moduleContainer);exit;
                 $model->prepare();
             }
             return $model;
-        }//echo static::ClassName();var_dump($this->_models);var_dump($this->params);exit;
+        }
 
         //return false; // or exception is better
         throw new Exception("Shared model '{$alias}' not found in configuration of module " . static::className());
@@ -645,25 +614,19 @@ var_dump($moduleContainer);exit;
      * @return model|null
      */
     public static function dataModelByClass($modelClassBasename, $params = [], $config = [])
-    {//echo __METHOD__."('$modelClassBasename')<br>";
+    {
         $thisModule = static::instance();
 
-        $pathList = $thisModule->getBasePathList();//var_dump($pathList);
+        $pathList = $thisModule->getBasePathList();
         $nsList = $thisModule->getNamespaceList();
         foreach ($pathList as $i => $basePath) {
-            $modelPath = $basePath . DIRECTORY_SEPARATOR . static::$modelsSubdir . DIRECTORY_SEPARATOR . $modelClassBasename . '.php';//var_dump($modelPath);
+            $modelPath = $basePath . DIRECTORY_SEPARATOR . static::$modelsSubdir . DIRECTORY_SEPARATOR . $modelClassBasename . '.php';
             if (is_file($modelPath)) {
                 $modelFullName = $nsList[$i] . '\\' . static::$modelsSubdir . '\\' . $modelClassBasename;
                 break;
             }
         }
-        if (!empty($modelFullName)) {//echo"found:'$modelFullName'<br>";
-            //return new $modelFullName();
-/*
-            return Yii::createObject($modelFullName
-              , ['module' => $thisModule] // ignore if model not instanceof asb\yii2\models\DataModel
-            );
-*/
+        if (!empty($modelFullName)) {
             $model = Yii::createObject($modelFullName, $params);
             if ($model instanceof DataModel) {
                 //$model->module = $this;
@@ -694,7 +657,7 @@ var_dump($moduleContainer);exit;
         }
     }
     //public static function dataModel($alias) { return static::model($alias); } // deprecated
-//--- END of functionality to access models of module
+
 
     /** Assets defined in config params: 'ALIAS' => 'CLASS' */
     protected $_assets = [];

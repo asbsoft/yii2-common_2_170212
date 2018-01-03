@@ -15,7 +15,7 @@ use Exception;
 /**
  * Authorization helper.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class AuthHelper extends Object
 {
@@ -31,24 +31,24 @@ class AuthHelper extends Object
      * @return array [controllerArias => accessRules]
      */
     public static function moduleAccessRules($module)
-    {//echo __METHOD__."@{$module->className()}({$module->uniqueId})";
+    {
         if (empty(static::$_accessRules[$module->uniqueId])) {
             static::$_accessRules[$module->uniqueId] = [];
             if ($module instanceof UniModule) {
                 $pathList = $module->getBasePathList();
             } else {
                 $pathList = [$module->getBasePath()];
-            }//var_dump($pathList);
+            }
             foreach ($pathList as $path) {
                 $dir = $path . DIRECTORY_SEPARATOR . UniModule::$controllersSubdir;
                 if (is_dir($dir) && $handle = opendir($dir)) {
-                    while (false !== ($file = readdir($handle))) {//echo "{$dir}/{$file}<br>";
-                        if (1 === preg_match(UniModule::$regControllerFileSuffix, $file, $matches)) {//var_dump($matches[1]);
-                            $controllerId = Inflector::camel2id($matches[1]);//var_dump($controllerId);
+                    while (false !== ($file = readdir($handle))) {
+                        if (1 === preg_match(UniModule::$regControllerFileSuffix, $file, $matches)) {
+                            $controllerId = Inflector::camel2id($matches[1]);
                             $controller = $module->createControllerByID($controllerId);
                             if ($controller instanceof YiiBaseController) {
                                 static::$_modulesControllers[$module->uniqueId][$controllerId] = $controller::className();
-                                $behaviors = $controller->behaviors();//var_dump($behaviors);
+                                $behaviors = $controller->behaviors();
                                 if (empty($behaviors['access']['rules'])) {
                                     static::$_accessRules[$module->uniqueId][$controllerId] = [];
                                 } else {
@@ -61,7 +61,7 @@ class AuthHelper extends Object
                     closedir($handle); 
                 }
             }
-        }//var_dump(static::$_accessRules[$module->uniqueId]);//var_dump(static::$_modulesControllers);
+        }
         return static::$_accessRules[$module->uniqueId];
     }
 
@@ -72,18 +72,18 @@ class AuthHelper extends Object
      * @return boolean
      */
     public static function canUserRunAction($actionUid, $user = null)
-    {//echo __METHOD__."($user->id, $actionUid)<br>";
+    {
         if (empty($user)) $user = Yii::$app->user;
 
-        $parts = explode('/', $actionUid);//var_dump($parts);
+        $parts = explode('/', $actionUid);
         if ($parts === false || count($parts) < 3) {
             throw new Exception("Illegal action uniqueId format: '{$actionUid}'");
         } else {
             $actionId = array_pop($parts);
             $controllerId = array_pop($parts);
-            $moduleUid = implode ('/', $parts);//var_dump($moduleUid);
+            $moduleUid = implode ('/', $parts);
 
-            $module = Yii::$app->getModule($moduleUid);//var_dump($module::className());
+            $module = Yii::$app->getModule($moduleUid);
             if (empty($module)) {
                 //throw new Exception("Can't get module '{$moduleUid}'");
                 return false;
@@ -96,9 +96,9 @@ class AuthHelper extends Object
                         $rules = [];
                     } else {
                         $rules = $behaviors['access']['rules'];
-                    }//var_dump($rules);
+                    }
                     //static::$_accessRules[$moduleUid][$controllerId] = $rules;
-                } else {//var_dump($controller);exit;
+                } else {
                     throw new Exception("Illegal controller '{$controllerId}' in module '{$moduleUid}'");
                 }
             }
@@ -111,12 +111,12 @@ class AuthHelper extends Object
                 $request = Yii::$app->getRequest();
                 $result = false; // if rule(s) exists - deny by default
                 foreach ($ac->rules as $rule) {
-                    if ($rule->allows($action, $user, $request)) {//echo'allow by rule:';var_dump($rule);
+                    if ($rule->allows($action, $user, $request)) {
                         $result = true; // found allow rule
                         break;
                     }
                 }
-            }//var_dump($result);
+            }
 
             return $result;
         }

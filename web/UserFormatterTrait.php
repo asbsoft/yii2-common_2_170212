@@ -8,7 +8,7 @@ use Yii;
 use Exception;
 
 /**
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 trait UserFormatterTrait
 {
@@ -29,4 +29,5 @@ trait UserFormatterTrait
         $value = empty(self::$_usersNames[$id]) ? (static::$unexistentUser . $id) : self::$_usersNames[$id];
         return Html::encode($value);
     }
+
 }

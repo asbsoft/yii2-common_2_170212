@@ -17,7 +17,7 @@ class UrlManagerBase extends YiiUrlManager
      * @param yii\web\Request $request
      */
     public static function processLanguage($request)
-    {//echo __METHOD__;
+    {
 
         if (LangHelper::countActiveLanguages() > 1)
         {
@@ -38,29 +38,29 @@ class UrlManagerBase extends YiiUrlManager
             // and correct $request->pathInfo by cutting language part
             $pathInfo0 = $request->getPathInfo(); // pathInfo has not leading '/'
             //echo "orig pathInfo:'$pathInfo'<br>";
-            $parts = explode('/', $pathInfo0, 2);//var_dump($parts);
+            $parts = explode('/', $pathInfo0, 2);
             if (!empty($parts[0])) {
-                $langPart = $parts[0];//var_dump($langPart);
+                $langPart = $parts[0];
                 if (LangHelper::isValidLangCode($langPart)) {
                     $pathInfo = substr($pathInfo0, strlen($langPart) + 1);
                     $lang = $langPart;
                     $request->setPathInfo($pathInfo);
 
-                    $msg = "corrected pathInfo from '{$pathInfo0}' to '{$pathInfo}'<br>";//echo"$msg<br>";
+                    $msg = "corrected pathInfo from '{$pathInfo0}' to '{$pathInfo}'<br>";
                     Yii::trace($msg);
                 }
             }
 
             // Save language
-            $lang = LangHelper::normalizeLangCode($lang);//echo "new lang:'$lang'<br>";
+            $lang = LangHelper::normalizeLangCode($lang);
             Yii::$app->language = $lang;
             LangHelper::setDefaultLanguage($lang);
             LangHelper::saveLanguageInSession($lang);
 
             // Correct $request->url by cutting language part if exists
             $urlManager = Yii::$app->urlManager;
-            $baseUrl = $urlManager->showScriptName || !$urlManager->enablePrettyUrl ? $urlManager->getScriptUrl() : $urlManager->getBaseUrl();//echo "baseUrl=$baseUrl<br>";
-            $url0 = $request->getUrl();//echo "orig url:'$url0'<br>";
+            $baseUrl = $urlManager->showScriptName || !$urlManager->enablePrettyUrl ? $urlManager->getScriptUrl() : $urlManager->getBaseUrl();
+            $url0 = $request->getUrl();
             if ($baseUrl !== '' && strpos($url0, $baseUrl) === 0) { // $url0 = $request->url begin with '/'
                 $link = substr($url0, strlen($baseUrl));
                 if (isset($langPart) && LangHelper::isValidLangCode($langPart)) {
@@ -70,7 +70,7 @@ class UrlManagerBase extends YiiUrlManager
                     }
                     $url = $baseUrl . $link;
                     $request->setUrl($url);
-                    $msg = "correct request->url from '{$url0}' to '{$url}'";//echo"$msg<br>";
+                    $msg = "correct request->url from '{$url0}' to '{$url}'";
                     Yii::trace($msg);
                 }
             }

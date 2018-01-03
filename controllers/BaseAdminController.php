@@ -9,7 +9,7 @@ use yii\filters\AccessControl;
 /**
  * Base admin controller.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class BaseAdminController extends BaseController
 {
@@ -64,7 +64,7 @@ class BaseAdminController extends BaseController
         }
         if (!isset(static::$_urlLoginAdmin)) {
             static::$_urlLoginAdmin = static::$adminPath . static::$urlLoginDefaultAdminPart;
-        }//echo __METHOD__;var_dump(static::$_urlLoginAdmin);//exit;
+        }
         return static::$_urlLoginAdmin;
     }
     /**

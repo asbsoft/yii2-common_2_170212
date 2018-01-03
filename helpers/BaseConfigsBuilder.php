@@ -15,7 +15,7 @@ use ReflectionClass;
  * Module configs builder.
  * Build initial module configs by getting them from module's config file and all it parents configs.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class BaseConfigsBuilder extends Component
 {
@@ -42,18 +42,18 @@ class BaseConfigsBuilder extends Component
      * @return array result config
      */
     public static function getAllConfigs($modulePath, $config = [])
-    {//echo __METHOD__;echo"():'{$modulePath}'<br>";
-        $configFile = $modulePath . DIRECTORY_SEPARATOR . UniModule::$configsSubdir . DIRECTORY_SEPARATOR . UniModule::$configBasefilename . '.php';//var_dump($configFile);
+    {
+        $configFile = $modulePath . DIRECTORY_SEPARATOR . UniModule::$configsSubdir . DIRECTORY_SEPARATOR . UniModule::$configBasefilename . '.php';
         if (is_file($configFile)) {
             $addConfig = self::includeConfigFile($configFile);
-            if (!empty($addConfig)) {//echo'addConfig:';var_dump($addConfig);
-                $config = ArrayHelper::merge($addConfig, $config);//echo'merged_config:';var_dump($config);
+            if (!empty($addConfig)) {
+                $config = ArrayHelper::merge($addConfig, $config);
                 if (isset($addConfig['parentPath'])) {
-                    $parentPath = Yii::getAlias($addConfig['parentPath']);//echo'parentPath:';var_dump($parentPath);
+                    $parentPath = Yii::getAlias($addConfig['parentPath']);
                     if (is_dir($parentPath)) $config = self::getAllConfigs($parentPath, $config);
                 }
             }
-        }//echo'final_config:';var_dump($config);//exit;
+        }
         return $config;
     }
 
@@ -79,7 +79,7 @@ class BaseConfigsBuilder extends Component
      * @return array result config
      */
     public static function getConfig($module, $name = '', $recursive = true, $subdir = '')
-    {//echo __METHOD__.'(',$module::className().",$name,,$subdir)<br>";
+    {
         if ($subdir === '') $subdir = UniModule::$configsSubdir;
         if ($name   === '') $name   = UniModule::$configBasefilename;
         $app = Yii::$app;
@@ -87,12 +87,12 @@ class BaseConfigsBuilder extends Component
         $config = [];
         $class = new ReflectionClass($module);
         while (true) {
-            $modulePath = dirname($class->getFileName());//var_dump($modulePath);
-            $configFile = $modulePath . DIRECTORY_SEPARATOR . $subdir . DIRECTORY_SEPARATOR . $name . '.php';//
+            $modulePath = dirname($class->getFileName());
+            $configFile = $modulePath . DIRECTORY_SEPARATOR . $subdir . DIRECTORY_SEPARATOR . $name . '.php';
             if (is_file($configFile)) {
                 $addConfig = self::includeConfigFile($configFile);
                 if (!empty($addConfig)) {
-                    $config = ArrayHelper::merge($addConfig, $config);//echo 'merged config:';var_dump($config);
+                    $config = ArrayHelper::merge($addConfig, $config);
                 }
             }
             if (!$recursive) break;
@@ -105,7 +105,7 @@ class BaseConfigsBuilder extends Component
             if ($class->name == UniModule::className()) break;
             if ($class->name == $app::className()) break;
             //if ($class->name == __CLASS__) break;
-        }//echo 'result config:';var_dump($config);
+        }
         return $config;
     }
 

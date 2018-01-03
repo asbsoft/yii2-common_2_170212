@@ -12,7 +12,7 @@ use Yii;
  * If exists module with uniqueId $this->sitetreeModuleUniqueId than load UrlManager from there.
  * Otherwise use standard Yii URL manager.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class UrlManagerInModule extends UrlManagerBase
 {
@@ -37,9 +37,9 @@ class UrlManagerInModule extends UrlManagerBase
     public function getSitetreeManager()
     {    
         if (empty(static::$_sitetreeManager)) {
-            $module = Yii::$app->getModule($this->sitetreeModuleUniqueId);//var_dump($module);exit;
+            $module = Yii::$app->getModule($this->sitetreeModuleUniqueId);
             if (!empty($module) && $module instanceof UniModule) {
-                $mgr = $module->getDataModel($this->sitetreeManagerAlias);//var_dump($mgr);
+                $mgr = $module->getDataModel($this->sitetreeManagerAlias);
                 if (empty($mgr->rules)) $mgr->rules = Yii::$app->urlManager->rules;
                 static::$_sitetreeManager = $mgr;
             }
@@ -51,13 +51,13 @@ class UrlManagerInModule extends UrlManagerBase
      * @inheritdoc
      */
     public function parseRequest($request)
-    {//echo __METHOD__.'<br>';var_dump($request->pathInfo);
-        $mgr = $this->getSitetreeManager();//echo __METHOD__;var_dump($mgr);
+    {
+        $mgr = $this->getSitetreeManager();
         if (empty($mgr)) {
             $result = parent::parseRequest($request);
         } else {
             $result = $mgr->parseRequest($request);
-        }//var_dump($result);
+        }
         return $result;
     }
 
@@ -65,13 +65,13 @@ class UrlManagerInModule extends UrlManagerBase
      * @inheritdoc
      */
     public function createUrl($params)
-    {//echo __METHOD__.'<br>';var_dump($params);
-        $mgr = $this->getSitetreeManager();//echo __METHOD__;var_dump($mgr);
+    {
+        $mgr = $this->getSitetreeManager();
         if (empty($mgr)) {
             $result = parent::createUrl($params);
         } else {
             $result = $mgr->createUrl($params);
-        }//var_dump($result);
+        }
         return $result;
     }
 

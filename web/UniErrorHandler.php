@@ -12,7 +12,7 @@ use yii\helpers\FileHelper;
  * - change standard layout at backend in basic/united Yii2-template by changind $this->errorAction
  * - for non-existent images files at web root: copy (with preprocessing) from hidden uploads area
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class UniErrorHandler extends ErrorHandler
 {
@@ -26,13 +26,13 @@ class UniErrorHandler extends ErrorHandler
      * @inheritdoc
      */
     protected function renderException($exception)
-    {//echo __METHOD__;var_dump($exception);exit;
+    {
 
         // non-existent files processing
         if (isset($exception->statusCode) && $exception->statusCode == 404) {
             $fileUrl = Yii::$app->request->pathInfo;
             $homeUrl = trim(Yii::$app->homeUrl, '/');
-            if (!empty($homeUrl)) $fileUrl = $homeUrl . '/' . $fileUrl;//var_dump($fileUrl);exit;
+            if (!empty($homeUrl)) $fileUrl = $homeUrl . '/' . $fileUrl;
 
             $webFile = new WebFile($fileUrl, [
                 'uploadsDirectCopy' => empty(Yii::$app->params['uploadsDirectCopy']) ? false : Yii::$app->params['uploadsDirectCopy'],
@@ -58,14 +58,14 @@ class UniErrorHandler extends ErrorHandler
                 }
             }
             $msg = $webFile->errmsg;
-            Yii::error($msg);//echo __METHOD__;var_dump($msg);exit;
+            Yii::error($msg);
         }
 
         // change errorAction for backend if need (in basic/united Yii2-template)
-        $adminPath = empty(Yii::$app->params['adminPath']) ? '' : Yii::$app->params['adminPath'];//var_dump($adminPath);
+        $adminPath = empty(Yii::$app->params['adminPath']) ? '' : Yii::$app->params['adminPath'];
 
         if ($adminPath && !empty($this->errorActionBackend)) {
-            $pathInfo = Yii::$app->request->pathInfo;//var_dump($pathInfo);
+            $pathInfo = Yii::$app->request->pathInfo;
             if (strpos($pathInfo, $adminPath) === 0) {
                 $this->errorAction = $this->errorActionBackend;
             }

@@ -10,7 +10,7 @@ use yii\base\Object;
  * - correct real images links to aliases and back (need when system move, f.e. to subdir)
  * - ...
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class EditorContentHelper extends Object
 {
@@ -38,15 +38,15 @@ class EditorContentHelper extends Object
         $webfilesSubdir = static::$webfilesSubdir;
         $webfilesSubdirOld = static::$webfilesSubdirOld;
 
-        $baseUrl = Yii::$app->urlManager->getBaseUrl();//var_dump($baseUrl);
+        $baseUrl = Yii::$app->urlManager->getBaseUrl();
         $trTable = [
             "src=\"{$baseUrl}/{$webfilesSubdirOld}" => "src=\"@{$webfilesSubdir}", //!! old -> new
             "src=\"{$baseUrl}/{$webfilesSubdir}" => "src=\"@{$webfilesSubdir}",
 
 //...todo add useful here...
 
-        ];//var_dump($trTable);exit;
-        $text = strtr($text, $trTable);//echo __METHOD__;var_dump($text);
+        ];
+        $text = strtr($text, $trTable);
         return $text;
     }
 
@@ -61,15 +61,15 @@ class EditorContentHelper extends Object
         $webfilesSubdir = static::$webfilesSubdir;
         $webfilesSubdirOld = static::$webfilesSubdirOld;
 
-        $baseUrl = Yii::$app->urlManager->getBaseUrl();//var_dump($baseUrl);
+        $baseUrl = Yii::$app->urlManager->getBaseUrl();
         $trTable = [
             "src=\"@{$webfilesSubdirOld}" => "src=\"{$baseUrl}/{$webfilesSubdir}", //!! old -> new
             "src=\"@{$webfilesSubdir}" => "src=\"{$baseUrl}/{$webfilesSubdir}",
 
 //...todo add useful here...
 
-        ];//var_dump($trTable);
-        $text = strtr($text, $trTable);//echo __METHOD__;var_dump($text);
+        ];
+        $text = strtr($text, $trTable);
         return $text;
     }
 
@@ -82,17 +82,17 @@ class EditorContentHelper extends Object
      * @return string
      */
     public static function uploadUrl($path = '', $uploadsAlias = '@uploads', $webfilesurlAlias = 'uploads')
-    {//echo __METHOD__."('$path')";
+    {
         $path = str_replace('\\', '/', $path);
         $webroot = str_replace('\\', '/', Yii::getAlias('@webroot'));
-        $uploads = str_replace('\\', '/', Yii::getAlias($uploadsAlias));//var_dump($uploads);
+        $uploads = str_replace('\\', '/', Yii::getAlias($uploadsAlias));
 
         //$subdir = str_replace($webroot, '', $uploads); // work correct only if uploads path is insite web root
-        $subdir = str_replace($uploads, '', $path);//var_dump($subdir);
+        $subdir = str_replace($uploads, '', $path);
 
         $web = Yii::getAlias('@web'); 
-        $files = Yii::getAlias($webfilesurlAlias);//var_dump($files);
-        $result = $web . (empty($web) ? '' : '/' ) . $files . $subdir;//echo'result:';var_dump($result);exit;
+        $files = Yii::getAlias($webfilesurlAlias);
+        $result = $web . (empty($web) ? '' : '/' ) . $files . $subdir;
 
         return $result;
     }

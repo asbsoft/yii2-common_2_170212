@@ -20,7 +20,7 @@ use Exception;
  *
  * Unfortunatly such modules can't support inheritance as a UniModule.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class SeparatedBaseModule extends BaseModule implements BootstrapInterface
 {
@@ -30,7 +30,7 @@ class SeparatedBaseModule extends BaseModule implements BootstrapInterface
     public function __construct($id, $parent = null, $config = [])
     {
         $addConfig = ConfigsBuilder::getConfig($this);
-        $config = ArrayHelper::merge($addConfig, $config);//echo"module($id) result config:";var_dump($config);
+        $config = ArrayHelper::merge($addConfig, $config);
         parent::__construct($id, $parent, $config);
     }
 
@@ -52,7 +52,7 @@ class SeparatedBaseModule extends BaseModule implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-        TranslationsBuilder::initTranslations($this);//var_dump(Yii::$app->i18n->translations);exit;
+        TranslationsBuilder::initTranslations($this);
         static::$tc = $this->tcModule;
 
         //echo'before:<br>'.RoutesInfo::showRoutes($this->uniqueId);

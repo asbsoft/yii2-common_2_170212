@@ -22,7 +22,7 @@ class MenuBuilder
 
         //$submodules = $module->modules; // without ModuleManager
         //$submodules = ModulesManager::submodules($module); // only dynamicly added modules
-        $submodules = ArrayHelper::merge($module->modules, ModulesManager::submodules($module));//echo"@{$module->uniqueId}={$module::className()}";var_dump(array_keys($submodules));
+        $submodules = ArrayHelper::merge($module->modules, ModulesManager::submodules($module));
         
         $itemsModules = [];
         foreach ($submodules as $submoduleId => $submodule) {
@@ -31,25 +31,25 @@ class MenuBuilder
 
             $nextItem = false;
             $startLinkInfo = BaseModule::startLink($submodule->uniqueId, $routesType);
-            if (!empty($startLinkInfo)) {//var_dump($startLinkInfo);
+            if (!empty($startLinkInfo)) {
                 $nextItem = [
                     'label' => $startLinkInfo['label'],
                     'url' => isset($startLinkInfo['route']) ? $startLinkInfo['route'] : $startLinkInfo['link']
-                ];//echo"found item for '{$submodule->uniqueId}'";var_dump($nextItem);
+                ];
             
                 if (!empty($startLinkInfo['route'][0])) {
                     $actionUid = trim($startLinkInfo['route'][0], '/');
-                    $can = AuthHelper::canUserRunAction($actionUid, Yii::$app->user);//echo"?can '$actionUid':";var_dump($can);
+                    $can = AuthHelper::canUserRunAction($actionUid, Yii::$app->user);
                     if (!$can) $nextItem = false;
                 }
-            }//echo"own item for '{$submodule->uniqueId}'={$submodule::className()}:";var_dump($nextItem);
+            }
 
-            $itemsSubmodules = static::modulesMenuitems($routesType, $submodule);//echo"submenu items for '{$submodule->uniqueId}'";var_dump($itemsSubmodules);
+            $itemsSubmodules = static::modulesMenuitems($routesType, $submodule);
             if (empty($itemsSubmodules)) {
                 if (!empty($nextItem)) $itemsModules[] = $nextItem;
             } else {
                 if (empty($nextItem)) {
-                    //$tc = TranslationsBuilder::getBaseTransCategory($submodule) . '/module';//echo"for {$submodule->uniqueId} tc:";var_dump($tc);
+                    //$tc = TranslationsBuilder::getBaseTransCategory($submodule) . '/module';
                     $label = empty($submodule->params['label'])
                            ? Yii::t('common', "Submenu for '{uid}'", ['uid' => $submodule->uniqueId])
                            //: Yii::t($tc, $submodule->params['label']);
@@ -64,7 +64,7 @@ class MenuBuilder
                     'items' => $itemsSubmodules,
                 ];
             }
-        }//echo"result menu for '{$module->uniqueId}'";var_dump($itemsModules);
+        }
         return $itemsModules;
     }
 

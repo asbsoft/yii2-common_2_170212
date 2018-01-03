@@ -9,9 +9,9 @@ use yii\base\Component;
 use yii\helpers\Inflector;
 
 /**
- * Module translations builder
+ * Module translations builder.
  *
- * @author ASB <ab2014box@gmail.com>
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
 class TranslationsBuilder extends Component
 {
@@ -25,15 +25,10 @@ class TranslationsBuilder extends Component
         if (!empty($module->baseTransCategory)) {
             $baseTransCategory = $module->baseTransCategory;
         } else {
-//            $baseTransCategory = $module->getReverseUniqueId(); //?? deprecated but work
-            //!! problems can be for modules: 'a/z/a/z' -> 'z.a.z.a*', 'z/a/z' -> 'z.a.z*'
-            // after krsort(Yii::$app->i18n->translations) category 'z.a.z*' stay first and catch requests with 'z.a.z.a*'
-//*
             // may be problem - category 'sys/content*' must be before 'sys*' - need krsort(Yii::$app->i18n->translations)
             $baseTransCategory = $module->uniqueId;
             $baseTransCategory = static::$transCatPrefix . '/' . $module->uniqueId;
-/**/
-        }//echo __METHOD__;var_dump($baseTransCategory);
+        }
         return $baseTransCategory;
     }
 
@@ -45,23 +40,20 @@ class TranslationsBuilder extends Component
     public static function initTranslations($module, $rewrite = false)
     {
         $baseTransCategory = static::getBaseTransCategory($module);
-        $module->templateTransCat = $baseTransCategory . '*';//echo"templateTransCat:'{$module->templateTransCat}'<br>";
-
-        //echo __METHOD__;var_dump(array_keys(static::$transCatToModule));
+        $module->templateTransCat = $baseTransCategory . '*';
 
         if ($rewrite || empty(static::$transCatToModule[$module->templateTransCat]))
         {
-            static::$transCatToModule[$module->templateTransCat] = $module;//foreach(static::$transCatToModule as $tc => $m) echo "$tc => {$m::ClassName()}<br>";
+            static::$transCatToModule[$module->templateTransCat] = $module;
 
             // check module with all parents for exist messages subdir, stop on first found:
-            $basePathList = $module->getBasePathList();//var_dump($basePathList);
+            $basePathList = $module->getBasePathList();
             foreach ($basePathList as $basePath) {
-                $messagesBasePath = $basePath . '/' . $module::$messagesSubdir;//echo"isdir?messagesBasePath:{$messagesBasePath}<br>";
-                if (is_dir($messagesBasePath)) {//echo"isdir!messagesBasePath:{$messagesBasePath}<br>";
+                $messagesBasePath = $basePath . '/' . $module::$messagesSubdir;
+                if (is_dir($messagesBasePath)) {
                     break;
-                //} else { $messagesBasePath = $module->basePath . '/' . $module::$messagesSubdir; } // default is subdir of initial module
                 }
-            }//echo"for {$module->uniqueId}: templateTransCat:'{$module->templateTransCat}', messagesBasePath:'{$messagesBasePath}'<br>";//exit;
+            }
             
             $module->tcModule         = $baseTransCategory . '/module';
             $module->tcModels         = $baseTransCategory . '/models';
@@ -97,7 +89,7 @@ class TranslationsBuilder extends Component
                         $fileMap["{$baseTransCategory}/{$prefix}{$name}"] = "{$prefix}{$name}.php";
                     }
                 }
-            }//echo"templateTransCat:'{$module->templateTransCat}',fileMap:";var_dump($fileMap);
+            }
 
             Yii::$app->getI18n()->translations[$module->templateTransCat] = [
                 'class' => MessageSource::ClassName(),
@@ -105,12 +97,12 @@ class TranslationsBuilder extends Component
                 'fileMap' => $fileMap,
                 'sourceLanguage' => $module->sourceLanguage,
                 'on missingTranslation' => [TranslationEventHandler::className(), 'handleMissingTranslation'],
-            ];//echo"{$module->uniqueId}:";var_dump(Yii::$app->getI18n()->translations[$module->templateTransCat]);
+            ];
 
             krsort(Yii::$app->i18n->translations); //!! category 'sys/content*' must be before 'sys*'
             krsort(static::$transCatToModule);     // same problem
 
-            $msg = __FUNCTION__ . "(): loaded translations for module '{$module->uniqueId}': " . $module::className();//echo __METHOD__;var_dump($msg);
+            $msg = __FUNCTION__ . "(): loaded translations for module '{$module->uniqueId}': " . $module::className();
             Yii::trace($msg);
         }
     }

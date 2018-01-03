@@ -34,7 +34,7 @@ class UniApplication extends Application
     {
         parent::init();
 
-        RoutesBuilder::saveAppRoutes($this);//echo'<pre>'.RoutesInfo::showRoutes();exit;
+        RoutesBuilder::saveAppRoutes($this);
     }
 
     /**
@@ -50,7 +50,7 @@ class UniApplication extends Application
             if (is_dir($altDir)) {
                 Yii::setAlias('@bower', $this->altBowerAlias);
             }
-        }//echo __METHOD__;var_dump(Yii::$aliases);exit;
+        }
     }
 
 }
