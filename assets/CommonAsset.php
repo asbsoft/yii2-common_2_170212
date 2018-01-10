@@ -18,6 +18,6 @@ class CommonAsset extends AssetBundle
     }
 
     public $depends = [
-        'asb\yii2\common_2_170212\assets\BootstrapCssAsset', // need to move up 'bootstrap.css' in <head>s of render HTML-results
+        'yii\bootstrap\BootstrapAsset', // need to move up 'bootstrap.css' in <head>s of render HTML-results
     ];
 }
