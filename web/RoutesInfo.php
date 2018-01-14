@@ -16,13 +16,17 @@ class RoutesInfo
 {
     /**
      * Show all application routes.
-     * @params $moduleUid module uniqueId
+     * @param string $moduleUid module uniqueId
+     * @param Application $app 
      * @param boolean $echo if true print resule otherwise return result in string
      * @return string|null
      */
-    public static function showRoutes($moduleUid = '', $echo = false)
+    public static function showRoutes($moduleUid = '', $app = null, $echo = false)
     {
-        $urlMan = Yii::$app->urlManager;
+        if (empty($app)) {
+            $app = Yii::$app;
+        }
+        $urlMan = $app->urlManager;
         $result = '';
         foreach ($urlMan->rules as $rule) {
             if (empty($moduleUid)) {
