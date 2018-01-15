@@ -21,7 +21,11 @@ class BaseConfigsBuilder extends Component
 {
     /** Included files cache */
     protected static $_configFiles = [];
-    /** Get, save in cache and return result of include file */
+    /**
+     * Get, save in cache and return result of include file
+     * @param string $filename
+     * Note if config has some calculations caching may be not correct.
+     */
     public static function includeConfigFile($filename)
     {
         if (!isset(self::$_configFiles[$filename])) {
@@ -33,7 +37,12 @@ class BaseConfigsBuilder extends Component
         }
         return self::$_configFiles[$filename];
     }
-    
+    /** Clean included files cache */
+    public static function cleanConfigFileCache()
+    {
+        static::$_configFiles = [];
+    }
+
     /**
      * Recursively get configs for module and all it's PHP-parents.
      * DEPRECATED!!. Use static::getConfig().
