@@ -63,27 +63,37 @@ class ModulesManager implements ModulesManagerInterface
     /**
      * Add new module to list modules with already installed submodules.
      * @param yii\base\Module $module
+     * @param yii\base\Application $app
      */
-    public static function setAlreadyAddSubmodules($module)
+    public static function setAlreadyAddSubmodulesFor($module, $app = null)
     {
+        if (empty($app)) {
+            $app = Yii::$app;
+        }
+        $appKey = $app instanceof UniApplication ? $app->appKey() : 'unknown';
         if($module instanceof YiiBaseModule) {
-            static::$_modulesWithInstalledSubmodules[$module::className()] = $module->uniqueId; // uniqueId for Yii::$app = ''
+            static::$_modulesWithInstalledSubmodules[$appKey][$module::className()] = $module->uniqueId; // uniqueId for Yii::$app = ''
         }
     }
     /**
      * Check if $module has additional dynamic submodules
      * @param yii\base\Module|string $module
+     * @param yii\base\Application $app
      * @return boolean
      */
-    public static function alreadyAddSubmodules($module)
+    public static function alreadyAddSubmodulesFor($module, $app = null)
     {
+        if (empty($app)) {
+            $app = Yii::$app;
+        }
+        $appKey = $app instanceof UniApplication ? $app->appKey() : 'unknown';
         if($module instanceof YiiBaseModule) {
             //$module = $module->uniqueId;
             $module = $module::className();
         }
-        if (is_string($module)) {
-            if (array_key_exists($module, static::$_modulesWithInstalledSubmodules)) return true;
-            if (in_array($module, static::$_modulesWithInstalledSubmodules)) return true;
+        if (is_string($module) && !empty(static::$_modulesWithInstalledSubmodules[$appKey])) {
+            if (array_key_exists($module, static::$_modulesWithInstalledSubmodules[$appKey])) return true;
+            if (in_array($module, static::$_modulesWithInstalledSubmodules[$appKey])) return true;
         }
         return false;
     }
