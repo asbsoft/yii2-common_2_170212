@@ -53,4 +53,12 @@ class UniApplication extends Application
         }
     }
 
+    /**
+     * @return string application composite type
+     */
+    public function appKey()
+    {
+        return $this->appTemplate . '-' . $this->type;
+    }
+
 }
