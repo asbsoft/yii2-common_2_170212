@@ -2,6 +2,7 @@
 
 namespace asb\yii2\common_2_170212\helpers;
 
+use asb\yii2\common_2_170212\base\UniApplication;
 use asb\yii2\common_2_170212\base\UniModule;
 
 use Yii;
@@ -24,18 +25,23 @@ class BaseConfigsBuilder extends Component
     /**
      * Get, save in cache and return result of include file
      * @param string $filename
+     * @param Application $application
      * Note if config has some calculations caching may be not correct.
      */
-    public static function includeConfigFile($filename)
+    public static function includeConfigFile($filename, $application = null)
     {
-        if (!isset(self::$_configFiles[$filename])) {
+        if (empty($application)) {
+            $application = Yii::$app;
+        }
+        $type = $application instanceof UniApplication ? $application->type : 'standard';
+        if (!isset(self::$_configFiles[$filename][$type])) {
             if (is_file($filename)) {
-                self::$_configFiles[$filename] = include($filename);
+                self::$_configFiles[$filename][$type] = include($filename); // can use var $application in $filename
             } else {
-                throw new InvalidConfigException("Need config file '$filename'");
+                throw new InvalidConfigException("Config file '$filename' required");
             }
         }
-        return self::$_configFiles[$filename];
+        return self::$_configFiles[$filename][$type];
     }
     /** Clean included files cache */
     public static function cleanConfigFileCache()

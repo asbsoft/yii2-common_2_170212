@@ -95,17 +95,22 @@ class ModulesManager implements ModulesManagerInterface
      * addition to static submodules defined in module's $config['modules'].
      * @param \yii\base\Module $module
      * @param boolean $onlyActivated if true show only activated in Modules manager
+     * @param \yii\base\Application $app
      * @return array of submodules configs
      * see getSubmodules()
      */
-    public static function submodules($module, $onlyActivated = true)
+    public static function submodules($module, $onlyActivated = true, $app = null)
     {
-        $modmgr = static::instance();
-        if (!isset(static::$_additionalSubmodules[$module->uniqueId])) {
-            $result = $modmgr->getSubmodules($module, $onlyActivated);
-            $_additionalSubmodules[$module->uniqueId] = $result;
+        if (empty($app)) {
+            $app = Yii::$app;
         }
-        return $_additionalSubmodules[$module->uniqueId];
+        $appKey = $app instanceof UniApplication ? $app->appKey() : 'unknown';
+        $modmgr = static::instance();
+        if (!isset(static::$_additionalSubmodules[$appKey][$module->uniqueId])) {
+            $result = $modmgr->getSubmodules($module, $onlyActivated);
+            $_additionalSubmodules[$appKey][$module->uniqueId] = $result;
+        }
+        return $_additionalSubmodules[$appKey][$module->uniqueId];
     }
 
     /**
