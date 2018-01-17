@@ -33,15 +33,15 @@ class BaseConfigsBuilder extends Component
         if (empty($application)) {
             $application = Yii::$app;
         }
-        $type = $application instanceof UniApplication ? $application->appKey() : 'unknown';
-        if (!isset(self::$_configFiles[$filename][$type])) {
+        $appKey = $application instanceof UniApplication ? $application->appKey : 'unknown';
+        if (!isset(self::$_configFiles[$filename][$appKey])) {
             if (is_file($filename)) {
-                self::$_configFiles[$filename][$type] = include($filename); // can use var $application in $filename
+                self::$_configFiles[$filename][$appKey] = include($filename); // can use var $application in $filename
             } else {
                 throw new InvalidConfigException("Config file '$filename' required");
             }
         }
-        return self::$_configFiles[$filename][$type];
+        return self::$_configFiles[$filename][$appKey];
     }
     /** Clean included files cache */
     public static function cleanConfigFileCache()

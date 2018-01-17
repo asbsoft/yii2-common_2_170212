@@ -85,7 +85,7 @@ class RoutesBuilder extends BaseRoutesBuilder
     protected static function getAppKey($app)
     {
         if ($app instanceof UniApplication) {
-            return $app->appKey();
+            return $app->appKey;
         } else {
             throw new Exception("Can't get application type for non-UniApplication");
         }
