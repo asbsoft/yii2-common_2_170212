@@ -354,9 +354,10 @@ class BaseModule extends Module implements BootstrapInterface
      */
     public function bootstrap($app)
     {
+        $appKey = $app instanceof UniApplication ? $app->appKey : 'unknown';
 
-        if (empty(static::$_bootstrappedModules[$this->uniqueId])) {
-            static::$_bootstrappedModules[$this->uniqueId] = true;
+        if (empty(static::$_bootstrappedModules[$appKey][$this->uniqueId])) {
+            static::$_bootstrappedModules[$appKey][$this->uniqueId] = true;
 
             TranslationsBuilder::initTranslations($this);
             static::$tc = $this->tcModule;
