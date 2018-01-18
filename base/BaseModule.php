@@ -9,6 +9,7 @@ use asb\yii2\common_2_170212\web\RoutesInfo;
 use asb\yii2\common_2_170212\i18n\TranslationsBuilder;
 
 use Yii;
+use yii\base\BootstrapInterface;
 use yii\base\Module;
 use yii\web\GroupUrlRule;
 use yii\rest\UrlRule as RestUrlRule;
@@ -22,7 +23,7 @@ use ReflectionClass;
  *
  * @author Alexandr Belogolovsky <ab2014box@gmail.com>
  */
-class BaseModule extends Module
+class BaseModule extends Module implements BootstrapInterface
 {
     const MODULE_UNITED   = 'MODULE_UNITED';
     const MODULE_FRONTEND = 'MODULE_FRONTEND';
