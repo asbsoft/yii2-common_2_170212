@@ -26,8 +26,11 @@ class ConfigsBuilder extends BaseConfigsBuilder
         if (empty($application)) {
             $application = Yii::$app;
         }
+        $appKey = $application instanceof UniApplication ? $application->appKey : 'unknown';
+        $cacheKey = static::$confFileCacheKey . '/' . $appKey;
+
         if (empty(static::$_configFiles) && $application->cache->exists(static::$confFileCacheKey)) {
-            static::$_configFiles = $application->cache->get(static::$confFileCacheKey);
+            static::$_configFiles = $application->cache->get($cacheKey);
         }
 
         return parent::includeConfigFile($filename, $application);
@@ -41,9 +44,28 @@ class ConfigsBuilder extends BaseConfigsBuilder
         if (empty($application)) {
             $application = Yii::$app;
         }
+        $appKey = $application instanceof UniApplication ? $application->appKey : 'unknown';
+        $cacheKey = static::$confFileCacheKey . '/' . $appKey;
+
         if ($application->cache instanceof Cache && !empty(static::$_configFiles)) {
-            $application->cache->set(static::$confFileCacheKey, static::$_configFiles, static::$defaultCacheDuration);
+            $application->cache->set($cacheKey, static::$_configFiles, static::$defaultCacheDuration);
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function cleanConfigFileCache($application = null)
+    {
+        if (empty($application)) {
+            $application = Yii::$app;
+        }
+        $appKey = $application instanceof UniApplication ? $application->appKey : 'unknown';
+        $cacheKey = static::$confFileCacheKey . '/' . $appKey;
+
+        $application->cache->delete($cacheKey);
+
+        parent::cleanConfigFileCache($application);
     }
 
 }
