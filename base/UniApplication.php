@@ -54,11 +54,22 @@ class UniApplication extends Application
     }
 
     /**
+     * Get application key describes kind of applicayion
      * @return string application composite type
      */
     public function getAppKey()
     {
         return $this->appTemplate . '-' . $this->type;
+    }
+
+    /**
+     * Get application key describes kind of applicayion
+     * @param yii\web\Application $app
+     * @return string application composite type
+     */
+    public static function appKey($app)
+    {
+        return $appKey = $app instanceof self ? $app->getAppKey() : 'unknown';
     }
 
 }

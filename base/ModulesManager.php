@@ -2,6 +2,7 @@
 
 namespace asb\yii2\common_2_170212\base;
 
+use asb\yii2\common_2_170212\base\UniApplication;
 use asb\yii2\common_2_170212\base\UniModule;
 
 use Yii;
@@ -70,7 +71,7 @@ class ModulesManager implements ModulesManagerInterface
         if (empty($app)) {
             $app = Yii::$app;
         }
-        $appKey = $app instanceof UniApplication ? $app->appKey : 'unknown';
+        $appKey = UniApplication::appKey($app);
         if($module instanceof YiiBaseModule) {
             static::$_modulesWithInstalledSubmodules[$appKey][$module::className()] = $module->uniqueId; // uniqueId for Yii::$app = ''
         }
@@ -86,7 +87,7 @@ class ModulesManager implements ModulesManagerInterface
         if (empty($app)) {
             $app = Yii::$app;
         }
-        $appKey = $app instanceof UniApplication ? $app->appKey : 'unknown';
+        $appKey = UniApplication::appKey($app);
         if($module instanceof YiiBaseModule) {
             //$module = $module->uniqueId;
             $module = $module::className();
@@ -114,7 +115,7 @@ class ModulesManager implements ModulesManagerInterface
         if (empty($app)) {
             $app = Yii::$app;
         }
-        $appKey = $app instanceof UniApplication ? $app->appKey : 'unknown';
+        $appKey = UniApplication::appKey($app);
         $modmgr = static::instance();
         if (!isset(static::$_additionalSubmodules[$appKey][$module->uniqueId])) {
             $result = $modmgr->getSubmodules($module, $onlyActivated);

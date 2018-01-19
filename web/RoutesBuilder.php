@@ -27,7 +27,7 @@ class RoutesBuilder extends BaseRoutesBuilder
     public static function collectRoutes($routeConfig, $app = null)
     {
         $app = empty($app) ? Yii::$app : $app;
-        $appKey = static::getAppKey($app);
+        $appKey = UniApplication::appKey($app);
         $moduleUid = $routeConfig['moduleUid'];
         $routesType = $routeConfig['routesType'];
 
@@ -49,7 +49,7 @@ class RoutesBuilder extends BaseRoutesBuilder
     public static function saveAppRoutes($app = null)
     {
         $app = empty($app) ? Yii::$app : $app;
-        $appKey = static::getAppKey($app);
+        $appKey = UniApplication::appKey($app);
 
         if ($app->cache instanceof Cache && isset(static::$_routes[$appKey])) {
             $app->cache->set($appKey, static::$_routes[$appKey], static::$defaultCacheDuration);
@@ -63,7 +63,7 @@ class RoutesBuilder extends BaseRoutesBuilder
     public static function loadRoutes($app = null)
     {
         $app = empty($app) ? Yii::$app : $app;
-        $appKey = static::getAppKey($app);
+        $appKey = UniApplication::appKey($app);
 
         if (!isset(static::$_routes[$appKey])) {
             if ($app->cache instanceof Cache) {
@@ -74,20 +74,6 @@ class RoutesBuilder extends BaseRoutesBuilder
                     static::$_routes[$appKey] = [];
                 }
             }
-        }
-    }
-
-    /**
-     * Get application's type as unique key.
-     * @param \yii\base\Application $app
-     * @return string
-     */
-    protected static function getAppKey($app)
-    {
-        if ($app instanceof UniApplication) {
-            return $app->appKey;
-        } else {
-            throw new Exception("Can't get application type for non-UniApplication");
         }
     }
 

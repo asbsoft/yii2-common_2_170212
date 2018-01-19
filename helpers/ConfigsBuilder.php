@@ -2,6 +2,8 @@
 
 namespace asb\yii2\common_2_170212\helpers;
 
+use asb\yii2\common_2_170212\base\UniApplication;
+
 use Yii;
 use yii\caching\Cache;
 
@@ -26,7 +28,7 @@ class ConfigsBuilder extends BaseConfigsBuilder
         if (empty($application)) {
             $application = Yii::$app;
         }
-        $appKey = $application instanceof UniApplication ? $application->appKey : 'unknown';
+        $appKey = UniApplication::appKey($application);
         $cacheKey = static::$confFileCacheKey . '/' . $appKey;
 
         if (empty(static::$_configFiles) && $application->cache->exists(static::$confFileCacheKey)) {
@@ -44,7 +46,7 @@ class ConfigsBuilder extends BaseConfigsBuilder
         if (empty($application)) {
             $application = Yii::$app;
         }
-        $appKey = $application instanceof UniApplication ? $application->appKey : 'unknown';
+        $appKey = UniApplication::appKey($application);
         $cacheKey = static::$confFileCacheKey . '/' . $appKey;
 
         if ($application->cache instanceof Cache && !empty(static::$_configFiles)) {
@@ -60,7 +62,7 @@ class ConfigsBuilder extends BaseConfigsBuilder
         if (empty($application)) {
             $application = Yii::$app;
         }
-        $appKey = $application instanceof UniApplication ? $application->appKey : 'unknown';
+        $appKey = UniApplication::appKey($application);
         $cacheKey = static::$confFileCacheKey . '/' . $appKey;
 
         $application->cache->delete($cacheKey);

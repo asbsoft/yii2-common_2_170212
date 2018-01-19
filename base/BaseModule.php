@@ -2,8 +2,7 @@
 
 namespace asb\yii2\common_2_170212\base;
 
-use asb\yii2\common_2_170212 as asbcommon;
-
+use asb\yii2\common_2_170212\base\UniApplication;
 use asb\yii2\common_2_170212\web\RoutesBuilder;
 use asb\yii2\common_2_170212\web\RoutesInfo;
 use asb\yii2\common_2_170212\i18n\TranslationsBuilder;
@@ -354,7 +353,7 @@ class BaseModule extends Module implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-        $appKey = $app instanceof UniApplication ? $app->appKey : 'unknown';
+        $appKey = UniApplication::appKey($app);
 
         if (empty(static::$_bootstrappedModules[$appKey][$this->uniqueId])) {
             static::$_bootstrappedModules[$appKey][$this->uniqueId] = true;
