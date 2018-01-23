@@ -6,6 +6,7 @@ use yii\web\Application;
 use asb\yii2\common_2_170212\web\RoutesBuilder;
 use asb\yii2\common_2_170212\web\RoutesInfo;
 
+use yii\base\InvalidRouteException;
 use Yii;
 
 class UniApplication extends Application
@@ -17,6 +18,9 @@ class UniApplication extends Application
 
     const APP_TEMPLATE_BASIC    = 'basic';
     const APP_TEMPLATE_ADVANCED = 'advanced';
+
+    /** If true do not throw exception on illegal route in runAction() */
+    public static $loyalModeRunAction = true;
 
     /** Application template */
     public $appTemplate = self::APP_TEMPLATE_BASIC;
@@ -70,6 +74,30 @@ class UniApplication extends Application
     public static function appKey($app)
     {
         return $appKey = $app instanceof self ? $app->getAppKey() : 'unknown';
+    }
+
+    /**
+     * @inheritdoc
+     * Loyal mode: message instead of exception.
+     */
+    public function runAction($route, $params = [])
+    {
+        try {
+            $result = parent::runAction($route, $params);
+        } catch (InvalidRouteException $e) {
+            $msg = $e->getMessage();
+            Yii::error($msg);
+
+            if (empty(static::$loyalModeRunAction)) {
+                throw new InvalidRouteException($msg, $e->getCode());
+            }
+
+            $result = '';
+            if (YII_DEBUG) {
+                $result = $msg;
+            }
+        }
+        return $result;
     }
 
 }
