@@ -5,6 +5,7 @@ namespace asb\yii2\common_2_170212\base;
 use yii\web\Application;
 use asb\yii2\common_2_170212\web\RoutesBuilder;
 use asb\yii2\common_2_170212\web\RoutesInfo;
+use asb\yii2\common_2_170212\web\WebFile;
 
 use yii\base\InvalidRouteException;
 use Yii;
@@ -19,8 +20,9 @@ class UniApplication extends Application
     const APP_TEMPLATE_BASIC    = 'basic';
     const APP_TEMPLATE_ADVANCED = 'advanced';
 
-    /** If true do not throw exception on illegal route in runAction() */
-    public static $loyalModeRunAction = true;
+    /** If true do not throw exception on illegal route in runAction() for renderPartial-(sub)pages */
+  //public static $loyalModeRunAction = true;//todo
+    public static $loyalModeRunAction = false;
 
     /** Application template */
     public $appTemplate = self::APP_TEMPLATE_BASIC;
@@ -85,13 +87,20 @@ class UniApplication extends Application
         try {
             $result = parent::runAction($route, $params);
         } catch (InvalidRouteException $e) {
-            $msg = $e->getMessage();
+            $msg = __FUNCTION__ . ': ' . $e->getMessage();
             Yii::error($msg);
 
-            if (empty(static::$loyalModeRunAction)) {
+            $ext = pathinfo($route, PATHINFO_EXTENSION);
+
+            if (empty(static::$loyalModeRunAction)
+              || in_array(strtolower($ext), WebFile::$allowedExtensions)  // if image file then throw exception to WebFile
+              // todo: if not renderPartial page
+            ) {
                 throw new InvalidRouteException($msg, $e->getCode());
             }
 
+// todo
+            // echo without exception - only for renderPartial-parts of page, not for independent pages
             $result = '';
             if (YII_DEBUG) {
                 $result = $msg;

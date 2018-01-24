@@ -16,10 +16,11 @@ use yii\helpers\FileHelper;
  */
 class BaseWebFile extends Object
 {
+    /** Allowed to copy files extentions */
+    public static $allowedExtensions = ['gif', 'png', 'jpeg', 'jpg'];
+
     /** Path to image to show instead of bad image */
     public $badImage = '@webroot/img/bad-image.jpg'; // default, can redefine when create this Object
-
-    public $allowedExtensions = ['gif', 'png', 'jpeg', 'jpg'];
     
     /** Root for upload files. Not in web root recommended!! */
     public $uploadsRootPath = '@uploadspath';
@@ -152,7 +153,7 @@ class BaseWebFile extends Object
      */
     protected function isAllowedExtension()
     {
-        if (in_array(strtolower($this->_format), $this->allowedExtensions)) {
+        if (in_array(strtolower($this->_format), static::$allowedExtensions)) {
             return true;
         } else {
             return $this->_format;
