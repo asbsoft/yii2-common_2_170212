@@ -67,31 +67,34 @@ class RoutesInfo
         }
     }
 
+    public static $ruleShift = '   ';
     /**
      * Show route.
      * @param yii\web\UrlRule $rule
      * @param boolean $echo if true print resule otherwise return result in string
+     * @param boolean $showPattern
      * @return string|null
      */
-    public static function showRoute($rule, $echo = false)
+    public static function showRoute($rule, $echo = false, $showPattern = false)
     {
         $result = '';
         switch ($rule::className()) {
             case WebUrlRule::className():
-                $result .= "'" . htmlspecialchars($rule->pattern) . "'"
+                $result .= ''
+                   . "'" . htmlspecialchars($rule->name) . "'"
+                   . ($showPattern ? " (" . htmlspecialchars($rule->pattern) . ")" : '')
                    . " => '" . htmlspecialchars($rule->route) . "'"
                    . " ({$rule::className()})"
                    . "\n"
                    ;
                 break;
             case GroupUrlRule::className():
-                $result .= "{$rule::className()}:<br>";
+                $result .= "'{$rule->prefix}/...' ({$rule::className()}): <br>";
                 foreach ($rule->rules as $singleRule) {
-                    $result .= ' + '
-                     //. "'" . htmlspecialchars($rule->prefix) . '/'
-                       . "'" . htmlspecialchars($singleRule->pattern) . "'"
+                    $result .= static::$ruleShift
+                       . "'" . htmlspecialchars($singleRule->name) . "'"
+                       . ($showPattern ? " (" . htmlspecialchars($singleRule->pattern) . ")" : '')
                        . ' => '
-                     //. "'" . $rule->routePrefix . '/'
                        . "'" . htmlspecialchars($singleRule->route) . "'"
                        . "\n"
                        ;
@@ -106,11 +109,11 @@ class RoutesInfo
                     $controller = $rule->controller;
                     $urlPrefix = '';
                 }
-                $result .= "{$rule::className()}:<br>";
+                $result .= "'{$rule->prefix}/{$urlPrefix}/...' ({$rule::className()}): <br>";
                 foreach ($rule->patterns as $template => $action) {
-                    $result .= ' + '
-                       . "'" . htmlspecialchars($rule->prefix)
-                       . '/' . htmlspecialchars($urlPrefix) . '/'
+                    $result .= static::$ruleShift
+                       . "'" . $rule->prefix
+                       . '/' . $urlPrefix . '/'
                        . htmlspecialchars($template) . htmlspecialchars($rule->suffix) . "'"
                        . " => '" . $controller . '/' . htmlspecialchars($action) . "'"
                        . "\n"
@@ -120,9 +123,9 @@ class RoutesInfo
             default:
                 $result .= "{$rule::className()}:<br>";
                 if (method_exists($rule, 'showRouteInfo')) {
-                    $info = $rule->showRouteInfo();
+                    $info = $rule->showRouteInfo($showPattern);
                     $strings = explode("\n", trim($info));
-                    foreach ($strings as $str) $result .= " + " . trim($str) . "\n";
+                    foreach ($strings as $str) $result .= static::$ruleShift . trim($str) . "\n";
                 } else {
                     ob_start();
                     ob_implicit_flush(false);

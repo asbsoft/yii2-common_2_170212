@@ -12,8 +12,9 @@ interface UniUrlRuleInterface extends UrlRuleInterface
     /**
      * Show route info.
      * Use in RoutesInfo::showRoute().
+     * @param boolean $showPattern
      * @return string
      */
-    public function showRouteInfo();
+    public function showRouteInfo($showPattern = false);
 
 }
