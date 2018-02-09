@@ -31,7 +31,7 @@ class BaseDataModel extends ActiveRecord
     public $tc = '';
 
     /** @var array default order */
-    public $orderBy = ['id' => SORT_ASC];
+    public $orderBy = []; // ['id' => SORT_ASC]
 
     /** Page for current record */
     public $page = 1;
@@ -46,6 +46,12 @@ class BaseDataModel extends ActiveRecord
     {
         parent::init();
 
+        $primaryKeys = static::primaryKey();
+        if (isset($primaryKeys[0])) {
+            $primaryKey = $primaryKeys[0];
+            $this->orderBy = [$primaryKey => SORT_ASC];
+        }
+        
         if (empty($this->module)) {
             $rc = new ReflectionClass($this);
             $modelNamespace = $rc->getNamespaceName();
@@ -162,8 +168,14 @@ class BaseDataModel extends ActiveRecord
     public function calcPage($currentQuery = null)
     {
         $page = 1;
-        $num = $this->getOrderNumber($this->id, $currentQuery);
-        if ($num > 0) $page = (int) ceil($num / $this->pageSize);
+        $primaryKeys = static::primaryKey();
+        if (isset($primaryKeys[0])) {
+            $primaryKey = $primaryKeys[0];
+            $num = $this->getOrderNumber($this->$primaryKey, $currentQuery);
+            if ($num > 0) {
+                $page = (int) ceil($num / $this->pageSize);
+            }
+        }
         return $page;
     }
 
@@ -261,9 +273,16 @@ class BaseDataModel extends ActiveRecord
     {
         if (!in_array($direction, ['up', 'down'])) return false;
 
-        $item = self::findOne(['id' => $id]);
-        if (!empty($item->prio)) {
-            $prio = $item->prio;
+        $primaryKeys = static::primaryKey();
+        if (!isset($primaryKeys[0])) {
+            return false;
+        } else {
+            $primaryKey = $primaryKeys[0];
+        }
+
+        $item = self::findOne([$primaryKey => $id]);
+        if (!empty($item->$orderField)) {
+            $prio = $item->$orderField;
         } else {
             return false;
         }
@@ -280,7 +299,7 @@ class BaseDataModel extends ActiveRecord
             ->orderBy($orderBy)
             ->limit(1)
             ->one();
-        $swapId = !empty($swapItem->id) ? $swapItem->id : false;
+        $swapId = !empty($swapItem->$primaryKey) ? $swapItem->$primaryKey : false;
         return $swapId;
     }
 
