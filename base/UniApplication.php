@@ -19,11 +19,6 @@ class UniApplication extends Application
 
     const APP_TEMPLATE_BASIC    = 'basic';
     const APP_TEMPLATE_ADVANCED = 'advanced';
-
-    /** If true do not throw exception on illegal route in runAction() for renderPartial-(sub)pages */
-  //public static $loyalModeRunAction = true;//todo
-    public static $loyalModeRunAction = false;
-
     /** Application template */
     public $appTemplate = self::APP_TEMPLATE_BASIC;
 
@@ -79,10 +74,12 @@ class UniApplication extends Application
     }
 
     /**
-     * @inheritdoc
-     * Loyal mode: message instead of exception.
+     * Loyal version of runAction() for partial rendering action inside another template: message instead of exception.
+     * @param string $route the route that specifies the action.
+     * @param array $params the parameters to be passed to the action
+     * @return mixed the result of the action.
      */
-    public function runAction($route, $params = [])
+    public function renderAction($route, $params = [])
     {
         try {
             $result = parent::runAction($route, $params);
@@ -90,17 +87,6 @@ class UniApplication extends Application
             $msg = __FUNCTION__ . ': ' . $e->getMessage();
             Yii::error($msg);
 
-            $ext = pathinfo($route, PATHINFO_EXTENSION);
-
-            if (empty(static::$loyalModeRunAction)
-              || in_array(strtolower($ext), WebFile::$allowedExtensions)  // if image file then throw exception to WebFile
-              // todo: if not renderPartial page
-            ) {
-                throw new InvalidRouteException($msg, $e->getCode());
-            }
-
-// todo
-            // echo without exception - only for renderPartial-parts of page, not for independent pages
             $result = '';
             if (YII_DEBUG) {
                 $result = $msg;
