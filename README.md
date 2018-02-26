@@ -50,7 +50,7 @@ Using modules inheritance
   Than add this module as submodule to config of application or another module-container.
 
 * Now work such features:
-  - configs and params will merge with ancestor's data
+  - configs and params will merge with ancestors' data
   - messages will merge
   - for route(s) get latest file(s) 
   - for view(s) get latest file(s) - possible to redefine only required file(s)

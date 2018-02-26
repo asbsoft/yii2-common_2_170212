@@ -1,2 +1,9 @@
 
-/* common.css */
+.required label:after {
+    content: " *";
+    color: red;
+}
+
+.text-bold {
+    font-weight: bold;
+}
