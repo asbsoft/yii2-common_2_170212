@@ -2,11 +2,14 @@
 
 namespace asb\yii2\common_2_170212\base;
 
+use asb\yii2\common_2_170212\behaviors\ParamsAccessBehaviour;
+
 use yii\web\Application;
 use asb\yii2\common_2_170212\web\RoutesBuilder;
 use asb\yii2\common_2_170212\web\RoutesInfo;
 use asb\yii2\common_2_170212\web\WebFile;
 
+use yii\helpers\ArrayHelper;
 use yii\base\InvalidRouteException;
 use Yii;
 
@@ -36,6 +39,28 @@ class UniApplication extends Application
         parent::init();
 
         RoutesBuilder::saveAppRoutes($this);
+    }
+
+    /**
+     * Add to modules' behaviors from its' $params['behaviors']
+     * and default 'params-access' behavior.
+     * @return array the behavior configurations.
+     */
+    public function behaviors()
+    {
+        $behaviors = ArrayHelper::merge(parent::behaviors(), [
+            'params-access' => [
+                'class' => ParamsAccessBehaviour::className(),
+              //'defaultRole' => 'roleRoot',
+                'roleParams' => [
+                    '' => ['behaviors'], // parameters which nobody can edit, will overwrite another rules
+                ],
+            ],
+        ]);
+        if (isset($this->params['behaviors'])) {
+            $behaviors = ArrayHelper::merge($behaviors, $this->params['behaviors']);
+        }
+        return $behaviors;
     }
 
     /**

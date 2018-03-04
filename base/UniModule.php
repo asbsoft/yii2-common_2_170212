@@ -2,8 +2,11 @@
 
 namespace asb\yii2\common_2_170212\base;
 
+use asb\yii2\common_2_170212\behaviors\ParamsAccessBehaviour;
+
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\helpers\ArrayHelper;
 
 /**
  * United module.
@@ -13,6 +16,28 @@ use yii\base\InvalidConfigException;
 class UniModule extends UniBaseModule
 {
     public static $tc = 'common'; // default, can change in base\BaseModule::bootstrap()
+
+    /**
+     * Add to modules' behaviors from its' $params['behaviors']
+     * and default 'params-access' behavior.
+     * @return array the behavior configurations.
+     */
+    public function behaviors()
+    {
+        $behaviors = ArrayHelper::merge(parent::behaviors(), [
+            'params-access' => [
+                'class' => ParamsAccessBehaviour::className(),
+              //'defaultRole' => 'roleRoot',
+                'roleParams' => [
+                    '' => ['behaviors'], // parameters which nobody can edit, will overwrite another rules
+                ],
+            ],
+        ]);
+        if (isset($this->params['behaviors'])) {
+            $behaviors = ArrayHelper::merge($behaviors, $this->params['behaviors']);
+        }
+        return $behaviors;
+    }
 
     /** Get some module info
      *  @param string $cmd
