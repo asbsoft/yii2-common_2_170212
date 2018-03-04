@@ -51,9 +51,9 @@ class UniApplication extends Application
         $behaviors = ArrayHelper::merge(parent::behaviors(), [
             'params-access' => [
                 'class' => ParamsAccessBehaviour::className(),
-              //'defaultRole' => 'roleRoot',
-                'roleParams' => [
-                    '' => ['behaviors'], // parameters which nobody can edit, will overwrite another rules
+                'defaultRole' => 'roleRoot',
+                'readonlyParams' => [
+                    'behaviors', // parameters which nobody can edit, will overwrite another rules
                 ],
             ],
         ]);

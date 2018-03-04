@@ -11,26 +11,51 @@ use yii\base\Behavior;
  */
 class ParamsAccessBehaviour extends Behavior
 {
-    /** Default role can edit every parameters which did not describe in $this->roleParams */
+    /**
+     * @var string default role can edit every parameters which are not disable for edit
+     */
     public $defaultRole = 'roleRoot';
 
     /**
-     * @var array defines list of params available to edit by users with listed roles
+     * @var array defines list of params available to edit by user(s) with such role(s)
      * in format [role => array of parameters].
-     * Useful for disable edit read-only parameters and add some permissions if need.
+     * Useful to add some permissions to user(s) without $defaultRole.
+     * For such parameters $defaultRole will keep.
      * For example,
      * ```php
-     * [
-     *   '' => ['behaviors', 'uploadDir'], // parameters which nobody can edit, will overwrite another rules
-     *   'roleAdmin' => ['sizeListAdmin', 'sizeListFrontend'],
-     *   'roleNewsAuthor' => ['latestNewsCounter', 'sizeListAdmin'],
-     * ]
+     *     'roleNewsAuthor' => ['latestNewsCounter', 'showTopNews'],
      * ```
      * Another parameters by default can edit only user with $this->defaultRole.
      */
     public $roleParams = [];
 
-    /** List of restricted parameters in format [parameter => array of roles] */
+    /**
+     * @var array defines exact list of roles for parameter(s)
+     * in format [parameter => array of roles].
+     * Useful to disable $defaultRole by overwriting ne role list for parameter
+     * For example,
+     * ```php
+     *     'enableDiag' => ['roleRoot'], // ! overwrite rotes for param, disable $defaultRole to this parameter
+     *     'adminPath'  => [], // disable parameter for everybody, same as 'readonlyParams' => ['adminPath', ...]
+     * ]
+     * ```
+     * Another parameters by default can edit only user with $this->defaultRole.
+     */
+    public $paramRoles = [];
+
+    /**
+     * @var array defines list of params unavailable to edit
+     * For example,
+     * ```php
+     *     ['behaviors', 'uploadDir'] // parameters which nobody can edit, will overwrite another rules here
+     * ```
+     */
+    public $readonlyParams = [];
+
+    /**
+     * @var array list of restricted parameters in format [parameter => array of roles]
+     * For parameters which are not enumerated here mean default roles list: [$this->defaultRole]
+     */
     protected $_restrictedParams = [];
 
     /**
@@ -42,14 +67,25 @@ class ParamsAccessBehaviour extends Behavior
         parent::init();
 
         $this->_restrictedParams = [];
+
+        // add roles
         foreach ($this->roleParams as $role => $params) {
             foreach ($params as $param) {
-                if (empty($this->_restrictedParams[$param])) $this->_restrictedParams[$param] = [];
+                if (empty($this->_restrictedParams[$param])) {
+                    $this->_restrictedParams[$param] = [$this->defaultRole]; // add default role
+                }
                 array_push($this->_restrictedParams[$param], $role);
             }
         }
-        if (isset($this->roleParams[''])) {
-            foreach ($this->roleParams[''] as $param) { // overwrite
+
+        // overwrite roles
+        foreach ($this->paramRoles as $param => $roles) {
+            $this->_restrictedParams[$param] = $roles;
+        }
+        
+        // clean roles for read-only param(s)
+        if (isset($this->readonlyParams)) {
+            foreach ($this->readonlyParams as $param) {
                 $this->_restrictedParams[$param] = [];
             }
         }
