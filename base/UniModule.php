@@ -3,6 +3,7 @@
 namespace asb\yii2\common_2_170212\base;
 
 use asb\yii2\common_2_170212\behaviors\ParamsAccessBehaviour;
+use asb\yii2\common_2_170212\i18n\TranslationsBuilder;
 
 use Yii;
 use yii\base\InvalidConfigException;
@@ -49,7 +50,14 @@ class UniModule extends UniBaseModule
         switch ($cmd) {
           case 'label': // module's short name for menu
             if (!empty($this->params['label'])) {
-                return $this->params['label'];
+                $label = $this->params['label'];
+                // try to translate label
+                $tcCat = TranslationsBuilder::getBaseTransCategory($this);
+                $tc = "{$tcCat}/module";
+                if (!empty(Yii::$app->i18n->translations["{$tcCat}*"])) {
+                    $label = Yii::t($tc, $this->params['label']);
+                }
+                return $label;
             } else {
                 //return false;
                 try {
