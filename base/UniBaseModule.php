@@ -369,6 +369,13 @@ class UniBaseModule extends BaseModule
      */
     public static function getModuleByClassname($moduleClassName, $loadAnonimous = false)
     {
+        if (!is_string($moduleClassName) && !is_object($moduleClassName)) {
+            $message = __METHOD__ . ": Illegal classname: " . var_export($moduleClassName, true);
+            Yii::trace($message);
+            throw new Exception($message);
+            return null;
+        }
+        
         $result = $moduleClassName::getInstance();
         if (!empty($result)) {
             return $result; // found from loaded

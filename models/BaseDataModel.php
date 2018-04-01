@@ -231,8 +231,9 @@ class BaseDataModel extends ActiveRecord
     {
         $result = false;
 
-        $class = get_called_class();
-        $ns = dirname($class);
+        $className = get_called_class();
+        $refClass = new ReflectionClass($className);
+        $ns = $refClass->getNamespaceName();
 
         $len = strlen($ns) - strlen(UniModule::$modelsSubdir);
         if (strrpos($ns, UniModule::$modelsSubdir) == $len) {
