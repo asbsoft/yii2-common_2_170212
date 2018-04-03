@@ -2,11 +2,13 @@
 
 namespace asb\yii2\common_2_170212\web;
 
+use asb\yii2\common_2_170212\helpers\FileHelper;
+//use yii\helpers\FileHelper;
 use yii\imagine\Image;
-
-use Yii;
 use yii\base\Object;
-use yii\helpers\FileHelper;
+use Yii;
+
+use Exception;
 
 /**
  * Class provide synchronization with uploaded file and its mirror in web root.
@@ -62,8 +64,22 @@ class BaseWebFile extends Object
         $this->fileUrl = $fileUrl;
 
         $this->uploadsRootPath = Yii::getAlias($this->uploadsRootPath);
-        $this->webfileRootPath = Yii::getAlias($this->webfileRootPath);
         $this->webfileRootUrl  = Yii::getAlias($this->webfileRootUrl);
+
+        $this->webfileRootPath = Yii::getAlias($this->webfileRootPath);
+        $this->webfileRootPath = FileHelper::normalizePath($this->webfileRootPath);
+        if (is_dir($this->webfileRootPath) || @FileHelper::createDirectory($this->webfileRootPath)) {
+            $webfileRootPath = $this->webfileRootPath;
+            if (FileHelper::inCygwin()) {
+                $this->webfileRootPath = FileHelper::cygpath($this->webfileRootPath);
+            }
+            $this->webfileRootPath = realpath($this->webfileRootPath);
+            if ($this->webfileRootPath === false) {
+                $msg = "Fail realpath('$webfileRootPath') for exists folder - check for attributes";
+                Yii::error($msg);
+                throw new Exception($msg);
+            }
+        }
 
         $filesBaseUrl = $this->webfileRootUrl;
         $filesBaseUrl = trim($filesBaseUrl, '/') . '/';
@@ -71,7 +87,9 @@ class BaseWebFile extends Object
             $this->_fileSubpath = substr($fileUrl, strlen($filesBaseUrl));
             $this->_format = pathinfo($this->_fileSubpath, PATHINFO_EXTENSION);
             $this->_srcFilePath  = $this->uploadsRootPath . '/' . $this->_fileSubpath;
+            $this->_srcFilePath  = FileHelper::normalizePath($this->_srcFilePath);
             $this->_destFilePath = $this->webfileRootPath . '/' . $this->_fileSubpath;
+            $this->_destFilePath = FileHelper::normalizePath($this->_destFilePath);
         } else {
             $this->errmsg = __METHOD__ . ": "
                 . Yii::t($this->tc, "File '{file}' is not from upload mirror area", ['file' => $this->fileUrl]);
@@ -121,16 +139,8 @@ class BaseWebFile extends Object
             return false;
         }
 
-        $needUpdate = true;
+        $needUpdate = $this->needUpdate($this->_srcFilePath, $this->_destFilePath);
         if (is_file($this->_destFilePath)) {
-            // compare existing file size and times with source
-            $needUpdate = false;
-            if (filesize($this->_srcFilePath) != filesize($this->_destFilePath)) {
-                $needUpdate = true;
-            }
-            $srcTime  = filectime($this->_srcFilePath);
-            $descTime = filectime($this->_destFilePath);
-            if ($srcTime > $descTime) $needUpdate = true;
             if ($needUpdate && !@unlink($this->_destFilePath)) {
                 $this->errmsg = Yii::t($this->tc, "Can't delete file '{file}'", ['file' => $this->_destFilePath]);
                 return false;
@@ -145,6 +155,30 @@ class BaseWebFile extends Object
         $this->_fileBody = file_get_contents($this->_destFilePath); // new content
 
         return true;
+    }
+
+    /** 
+     * Check need update $destFilePath by $srcFilePath.
+     * @param string $srcFilePath
+     * @param string $destFilePath
+     * @return boolean return true if
+     */
+    public function needUpdate($srcFilePath, $destFilePath)
+    {
+        $needUpdate = true;
+        if (is_file($this->_destFilePath)) {
+            // compare existing file size and times with source
+            $needUpdate = false;
+            if (filesize($srcFilePath) != filesize($destFilePath)) {
+                $needUpdate = true;
+            }
+            $srcTime  = filectime($srcFilePath);
+            $descTime = filectime($destFilePath);
+            if ($srcTime > $descTime) {
+                $needUpdate = true;
+            }
+        }
+        return $needUpdate;
     }
 
     /**
@@ -176,8 +210,8 @@ class BaseWebFile extends Object
             try {
                 $image = $imagine->open($srcFilePath);
                 $fileBody = $image->get($this->_format, []); // preprocessed image
-            } catch (\Exception $ex) {
-                //$this->errmsg = Yii::t($this->tc, "Uploaded file '{file}' not an image", ['file' => $srcFilePath]);
+            } catch (Exception $ex) {
+              //$this->errmsg = Yii::t($this->tc, "Uploaded file '{file}' not an image", ['file' => $srcFilePath]);
                 $this->errmsg = $ex->getMessage();
                 Yii::error($this->errmsg);
                 //return false;
@@ -191,13 +225,19 @@ class BaseWebFile extends Object
 
         $destDir = dirname($destFilePath);
         if (!is_dir($destDir) && !@FileHelper::createDirectory($destDir)) {
-           $this->errmsg = Yii::t($this->tc, "Can't create destination folder '{dir}'", ['dir' => $destDir]);
+         //$this->errmsg = Yii::t($this->tc, "Can't create destination folder '{dir}'", ['dir' => $destDir]);
+           $this->errmsg = "Can't create destination folder '$destDir'";
+           Yii::error($this->errmsg);
            return false;
         }
 
         $result = @file_put_contents($destFilePath, $fileBody, LOCK_EX);
+        if ($result === false) {
+         //$this->errmsg = Yii::t($this->tc, "Fail in file_put_contents('{from}', '...')", ['from' => $destFilePath]);
+           $this->errmsg = "Fail in file_put_contents('$destFilePath', '...')";
+           Yii::error($this->errmsg);
+        }
         return $result;
     }
-
     
 }

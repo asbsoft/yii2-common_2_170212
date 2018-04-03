@@ -27,7 +27,6 @@ class UniErrorHandler extends ErrorHandler
      */
     protected function renderException($exception)
     {
-
         // non-existent files processing
         if (isset($exception->statusCode) && $exception->statusCode == 404) {
             $fileUrl = Yii::$app->request->pathInfo;

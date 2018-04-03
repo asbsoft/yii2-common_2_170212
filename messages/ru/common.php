@@ -22,6 +22,8 @@ return [
                                 => "Исходный файл '{file}' не найден",
     "File has not allowed type '{ext}'"
                                 => "Файл имеет недопустимий тип '{ext}'",
+    "Fail in file_put_contents('{from}', '...')"
+                                => "Проблема в file_put_contents('{from}', '...')",
 
 // helpers\MenuBuilder
     "Submenu for '{uid}'"       => "Подменю для '{uid}'",
