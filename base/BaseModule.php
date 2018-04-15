@@ -378,13 +378,14 @@ class BaseModule extends Module implements BootstrapInterface
                 if (!isset($component)) {
                     $component = Yii::createObject($class);
                 }
-
+/*
                 if ($component instanceof BootstrapInterface) {
                     Yii::trace('Bootstrap with ' . get_class($component) . '::bootstrap()', __METHOD__);
-                    $component->bootstrap($app);
+                    //$component->bootstrap($app); //!? twice bootstrap $component
                 } else {
                     Yii::trace('Bootstrap with ' . get_class($component), __METHOD__);
                 }
+*/
             }
         }
     }

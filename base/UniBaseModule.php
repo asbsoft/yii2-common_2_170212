@@ -16,6 +16,7 @@ use Yii;
 use yii\base\Module as YiiBaseModule;
 use yii\base\BootstrapInterface;
 use yii\base\Controller as YiiBaseController;
+use yii\base\UnknownPropertyException;
 
 use Exception;
 use ReflectionClass;
@@ -365,7 +366,8 @@ class UniBaseModule extends BaseModule
      * @param string $moduleClassName full class name with namespace
      * @param boolean $loadAnonimous set true to always return module object even if not connect to any another module (with random id)
      * Amonimous loading need for example in modules manager to load and analize module not add to system yet.
-     * @return Module object
+     * @return Module|null object or null if not found
+     * @throws Exception if error occured
      */
     public static function getModuleByClassname($moduleClassName, $loadAnonimous = false)
     {
@@ -376,13 +378,12 @@ class UniBaseModule extends BaseModule
             return null;
         }
         
-        $result = $moduleClassName::getInstance();
+        $result = $moduleClassName::getInstance(); // == null if module not found
         if (!empty($result)) {
             return $result; // found from loaded
         }
 
-        //?? deprecated: never run here ...
-        $uid = static::getModuleUidByClassname($moduleClassName);
+        $uid = static::getModuleUidByClassname($moduleClassName); //?? deprecated: never get result here
         if (!empty($uid)) {
             $result = Yii::$app->getModule($uid);
             if (!empty($result)) {
@@ -393,10 +394,10 @@ class UniBaseModule extends BaseModule
         }
 
         $message = __METHOD__."($moduleClassName): Can't get module by classname '{$moduleClassName}'.";
+        $result = null; // if module not found
         if (!$loadAnonimous) {
             Yii::trace($message);
-            //throw new Exception($message);
-            return null;
+            throw new Exception($message);
         } else {
             $message .= ' Create anonimous module.';
             Yii::trace($message);
@@ -406,7 +407,7 @@ class UniBaseModule extends BaseModule
             } else { // create noname module in cache
                 try {
                     $result = new $moduleClassName(uniqid(), null, ['noname' => true]); // noname is UniBaseModule attribute
-                } catch (\yii\base\UnknownPropertyException $ex) {
+                } catch (UnknownPropertyException $ex) {
                     $result = new $moduleClassName(uniqid(), null); //?! can't set config
                 }
                 if ($result instanceof static) { // need to prepare default UniBaseModule configs
