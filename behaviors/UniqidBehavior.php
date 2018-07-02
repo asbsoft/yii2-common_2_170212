@@ -90,7 +90,7 @@ class UniqidBehavior extends AttributeBehavior
         if (function_exists('com_create_guid')) {
             return $this->prefix . trim(com_create_guid(), '{}');
         } else {
-            return uniqid($this->prefix, $this->moreEntropy);
+            return $this->prefix . md5(uniqid('', $this->moreEntropy));
         }
     }
 
