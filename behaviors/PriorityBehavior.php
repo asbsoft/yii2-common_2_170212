@@ -30,6 +30,9 @@ use Closure;
  *         ];
  *     }
  * ```
+ *
+ * Not support now composite owner attribute. //todo
+ *
  * @author ASB <ab2014box@gmail.com>
  */
 class PriorityBehavior extends AttributeBehavior
@@ -63,6 +66,7 @@ class PriorityBehavior extends AttributeBehavior
         if (empty($this->attributes)) {
             $this->attributes = [
                 ActiveRecord::EVENT_BEFORE_INSERT => $this->priorityAttribute,
+                ActiveRecord::EVENT_BEFORE_UPDATE => $this->priorityAttribute,
             ];
         }
     }
@@ -71,7 +75,7 @@ class PriorityBehavior extends AttributeBehavior
      * Get owner attribute value. Logined user id by default.
      * @return mixed|null
      */
-    public function getOwnerAttributeValue()
+    public function getDefaultOwnerAttributeValue()
     {
         if (Yii::$app->has('user')) {
             $userId = Yii::$app->get('user')->id;
@@ -88,27 +92,52 @@ class PriorityBehavior extends AttributeBehavior
     protected function getValue($event)
     {
         if ($this->value === null) {
-            // get max priority of with owner_id = ownerAttributeValue
-            $priority = 1; // default if not found
-            $modelClass = $this->modelClass;
-            $query = $modelClass::find();
-            if ($this->funcGetOwnerAttributeValue !== false) {
-                if ($this->funcGetOwnerAttributeValue instanceof Closure) {
-                    $funcGetVal = $this->funcGetOwnerAttributeValue;
-                } else {
-                    $funcGetVal = [$this, 'getOwnerAttributeValue'];
-                }
-                $owherValue = call_user_func($funcGetVal);
+            if ($event->sender->isNewRecord // set priority for new record
+             || ($this->getOwnerValue() != $event->sender->oldAttributes[$this->ownerAttribute])) { // update priority if change owner
+                return $this->getPriority();
+            } else {
+                $ownerAttribute = $this->ownerAttribute;
+                return $event->sender->$ownerAttribute;
+            }
+        }
+        return parent::getValue($event);
+    }
+
+    /**
+     * @return int
+     */
+    protected function getPriority()
+    {
+        $priority = 1; // default if not found
+        $modelClass = $this->modelClass;
+        $query = $modelClass::find();
+        if ($this->funcGetOwnerAttributeValue !== false) {
+            $owherValue = $this->getOwnerValue();
+            if (isset($owherValue)) {
                 $query->where([$this->ownerAttribute => $owherValue]);
             }
-            $max = $query->max($this->priorityAttribute);
-            if (!empty($max)) {
-                $priority = $max + 1;
-            }
-            return $priority;
         }
+        $max = $query->max($this->priorityAttribute);
+        if (!empty($max)) {
+            $priority = $max + 1;
+        }
+        return $priority;
+    }
 
-        return parent::getValue($event);
+    /**
+     * @return mixed|null
+     */
+    protected function getOwnerValue()
+    {
+        if ($this->funcGetOwnerAttributeValue !== false) {
+            if ($this->funcGetOwnerAttributeValue instanceof Closure) {
+                $funcGetVal = $this->funcGetOwnerAttributeValue;
+            } else {
+                $funcGetVal = [$this, 'getDefaultOwnerAttributeValue'];
+            }
+            $owherValue = call_user_func($funcGetVal);
+            return $owherValue;
+        }
     }
 
 }
