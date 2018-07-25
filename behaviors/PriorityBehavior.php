@@ -92,12 +92,13 @@ class PriorityBehavior extends AttributeBehavior
     protected function getValue($event)
     {
         if ($this->value === null) {
-            if ($event->sender->isNewRecord // set priority for new record
-             || ($this->getOwnerValue() != $event->sender->oldAttributes[$this->ownerAttribute])) { // update priority if change owner
-                return $this->getPriority();
+            if ($event->sender->isNewRecord
+                || ($this->getOwnerValue() != $event->sender->oldAttributes[$this->ownerAttribute])
+            ) {
+                return $this->getPriority(); // set priority for new record or if owner change
             } else {
-                $ownerAttribute = $this->ownerAttribute;
-                return $event->sender->$ownerAttribute;
+                $priorityAttribute = $this->priorityAttribute;
+                return $event->sender->$priorityAttribute;
             }
         }
         return parent::getValue($event);
