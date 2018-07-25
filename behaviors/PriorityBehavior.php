@@ -112,9 +112,9 @@ class PriorityBehavior extends AttributeBehavior
         $modelClass = $this->modelClass;
         $query = $modelClass::find();
         if ($this->funcGetOwnerAttributeValue !== false) {
-            $owherValue = $this->getOwnerValue();
-            if (isset($owherValue)) {
-                $query->where([$this->ownerAttribute => $owherValue]);
+            $ownerValue = $this->getOwnerValue();
+            if (isset($ownerValue)) {
+                $query->where([$this->ownerAttribute => $ownerValue]);
             }
         }
         $max = $query->max($this->priorityAttribute);
@@ -135,8 +135,8 @@ class PriorityBehavior extends AttributeBehavior
             } else {
                 $funcGetVal = [$this, 'getDefaultOwnerAttributeValue'];
             }
-            $owherValue = call_user_func($funcGetVal);
-            return $owherValue;
+            $ownerValue = call_user_func($funcGetVal);
+            return $ownerValue;
         }
     }
 
