@@ -266,11 +266,11 @@ class BaseDataModel extends ActiveRecord
      * Search ID for record placed near record with $id for order by $orderField in $direction.
      * @param integer $id initial record id
      * @param string $direction is 'up' or 'down'
-     * @param array $where additional query condition, for example ['parent_id' => NNN]
+     * @param yii\db\ActiveQuery|array $query select items query or additional query condition, for example ['parent_id' => NNN]
      * @param string $orderField means ordering only by this field
      * @return integer|false looked for record id
      */
-    public function getNearId($id, $direction, $where = [], $orderField = 'prio')
+    public function getNearId($id, $direction, $query = [], $orderField = 'prio')
     {
         if (!in_array($direction, ['up', 'down'])) return false;
 
@@ -294,12 +294,15 @@ class BaseDataModel extends ActiveRecord
             $andWhere = ['<', $orderField, $prio];
             $orderBy = [$orderField => SORT_DESC];
         }
-        $swapItem = self::find()
-            ->where($where)
-            ->andWhere($andWhere)
+
+        if (is_array($query)) {
+            $where = $query;
+            $query = self::find()->where($where);
+        }
+        $query->andWhere($andWhere)
             ->orderBy($orderBy)
-            ->limit(1)
-            ->one();
+            ->limit(1);
+        $swapItem = $query->one();
         $swapId = !empty($swapItem->$primaryKey) ? $swapItem->$primaryKey : false;
         return $swapId;
     }
