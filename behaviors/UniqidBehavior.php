@@ -19,6 +19,10 @@ class UniqidBehavior extends AttributeBehavior
      */
     public $uniqidAttribute = 'uniqid';
     /**
+     * @var string query alias for unique attribute
+     */
+    public $queryAlias;
+    /**
      * @var string
      */
     public $prefix = '';
@@ -68,8 +72,9 @@ class UniqidBehavior extends AttributeBehavior
             while (true) {
                 $value = $this->getUniqValue();
                 $modelClass = $this->modelClass;
+                $uniqidAttribute = empty($this->queryAlias) ? $this->uniqidAttribute : "`$this->queryAlias`.`{$this->uniqidAttribute}`";
                 $exists = $modelClass::find()
-                    ->where([$this->uniqidAttribute => $value])
+                    ->where([$uniqidAttribute => $value])
                     ->exists();
                 if (!$exists) {
                     $this->value = $value;
