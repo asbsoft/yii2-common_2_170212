@@ -1,0 +1,49 @@
+<?php
+
+namespace asb\yii2\common_2_170212\models;
+
+use yii\db\Query as BaseQuery;
+
+/**
+ * Query represents a SELECT SQL statement.
+ * @see yii\db\Query
+ * @author Alexandr Belogolovsky <ab2014box@gmail.com>
+ */
+class Query extends BaseQuery
+{
+    /**
+     * Check if join already exists.
+     * Useful to prevent double joins.
+     * @return bool
+     */
+    public function hasJoin($aliasOrTable)
+    {
+        if ($this->join) {
+            foreach ($this->join as $join) {
+                $secondJoinParam = $join[1];
+                if (is_array($secondJoinParam)) {
+                    list($key, $val) = each($secondJoinParam);
+                    if ($key == $aliasOrTable) {
+                        return true;
+                    }
+                }
+                if (is_string($secondJoinParam)) {
+                    if ($secondJoinParam == $aliasOrTable) {
+                        return true;
+                    } else {
+                        $pos = strrpos($secondJoinParam, ' ');
+                        if ($pos) {
+                            $alias = substr($secondJoinParam, $pos);
+                            $alias = trim($alias, " \t`");
+                            if ($alias == $aliasOrTable) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+}
