@@ -11,6 +11,7 @@ trait QueryTrait
     /**
      * Check if join already exists.
      * Useful to prevent double joins.
+     * @param string $aliasOrTable for alias is string without quotes, for table - in format '{{%tablename}}'
      * @return bool
      */
     public function hasJoin($aliasOrTable)
@@ -32,7 +33,10 @@ trait QueryTrait
                         if ($pos) {
                             $alias = substr($secondJoinParam, $pos);
                             $alias = trim($alias, " \t`");
-                            if ($alias == $aliasOrTable) {
+                            $table = substr($secondJoinParam, 0, $pos);
+                            $table = trim($table);
+
+                            if ($alias == $aliasOrTable || $table == $aliasOrTable) {
                                 return true;
                             }
                         }
